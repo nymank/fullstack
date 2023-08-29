@@ -56,15 +56,15 @@ const App = () => {
 
   return (
     <div>
-      <PhonebookHeader title={"Phonebook"} />
+      <h2>"Phonebook"</h2>
       <SearchInput handleSearchChange={handleSearchChange} searchString={searchString} />
       <PersonForm
         handleSubmit={handleSubmit}
         handleNameChange={handleNameChange}
-        handleNumberChange={handleNumberChange} 
+        handleNumberChange={handleNumberChange}
         name={newName}
-        number={newNumber}/>
-      <PhonebookHeader title={"Numbers"} />
+        number={newNumber} />
+      <h2>Numbers:</h2>
       <PersonList persons={visiblePersons} />
     </div>
   )
