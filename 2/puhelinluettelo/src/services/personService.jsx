@@ -19,8 +19,15 @@ const addPerson = (person) => {
 const deletePerson = (id) => {
     const URL = `${BASE_SERVER_URL}/persons/${id}`
     return axios.delete(URL)
-        .then(res => "Deleted person with id: " +id)
+        .then(res => res.data)
         .catch(err => console.error(err))
 }
 
-export default { addPerson, getAllPersons, deletePerson }
+const updatePerson = (newPerson) => {
+    const URL = `${BASE_SERVER_URL}/persons/${newPerson.id}`
+    return axios.put(URL, newPerson)
+        .then(res => res.data)
+        .catch(err => console.error(err))
+}
+
+export default { addPerson, getAllPersons, deletePerson, updatePerson }

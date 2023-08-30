@@ -24,21 +24,36 @@ const App = () => {
   // get starting state and update current state
   useEffect(getAndSetPersons, [])
 
+  const resetInputs = () => {
+    setSearchString("")
+    setNewName("")
+    setNewNumber("")
+  }
 
   const handlePersonSubmit = (e) => {
     e.preventDefault()
     if (!newName || !newNumber) return
-    if (persons.findIndex(p => p.name === newName || p.number === newNumber) === -1) {
+    const nameIndex = persons.findIndex(p => p.name === newName.trim())
+    const numberIndex = persons.findIndex(p => p.number === newNumber.trim())
+    const nameInPersons = nameIndex !== -1
+    const numberInPersons = numberIndex !== -1
+    if (nameInPersons && !numberInPersons) {
+      // update number
+      if (window.confirm(`${newName} is already in the phonebook. Would you like to update their number to ${newNumber}?`)) {
+        personService.updatePerson({ ...persons[nameIndex], number: newNumber })
+          .then(updatedPerson => {
+            const copyPersons = [...persons]
+            copyPersons[nameIndex] = updatedPerson
+            setPersons(copyPersons)
+            resetInputs()
+          })
+      }
+    } else if (!nameInPersons && !numberInPersons) {
       personService.addPerson({ name: newName, number: newNumber })
         .then(newPerson => {
           setPersons(persons.concat(newPerson))
-          setSearchString("")
-          setNewName("")
-          setNewNumber("")
+          resetInputs()
         })
-
-    } else {
-      alert(`${newName} is already added to phonebook`)
     }
   }
 
@@ -60,8 +75,8 @@ const App = () => {
   const sendDeletePerson = (person) => {
     if (window.confirm(`Are you sure you want to delete ${person.name}?`)) {
       personService.deletePerson(person.id)
-        .then(deletedPerson => {
-          console.log(`${deletedPerson.name} removed from phonebook`)
+        .then((deletedPerson) => {
+          console.log(`${person.name} removed from phonebook`)
           getAndSetPersons()
         })
     }
@@ -71,7 +86,7 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h2>Snooker professionals Phonebook</h2>
       <SearchInput handleSearchChange={handleSearchChange} searchString={searchString} />
       <PersonForm
         handleSubmit={handlePersonSubmit}
