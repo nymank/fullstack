@@ -2,9 +2,18 @@
 import Person from "./Person"
 
 const PersonList = (props) => {
-    return(
+    const searchString = props.searchString
+
+    return (
         <div>
-            {props.persons.map((person) => <Person key={person.name} name={person.name} number={person.number} />)}
+            {
+                searchString ?
+                    props.persons.filter(
+                        person => person.name.toLowerCase().includes(searchString)
+                    ).map(p => <Person person={p} key={p.name} />)
+                    :
+                    props.persons.map(p => <Person person={p} key={p.name} />)
+            }
         </div>
     )
 }

@@ -13,18 +13,15 @@ const App = () => {
     { name: 'Duuds', number: '4321' }
   ]
   const [persons, setPersons] = useState([...testData])
-  const [visiblePersons, setVisiblePersons] = useState([...testData])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchString, setSearchString] = useState('')
 
-  const handleSubmit = (e) => {
+  const handlePersonSubmit = (e) => {
     e.preventDefault()
-    if (!newName) return
-    console.log("submit", e)
+    if (!newName || !newNumber) return
     if (persons.findIndex(p => p.name === newName) === -1) {
       setPersons([...persons, { name: newName, number: newNumber }])
-      setVisiblePersons([...persons, { name: newName, number: newNumber }])
       setSearchString("")
       setNewName("")
       setNewNumber("")
@@ -45,13 +42,7 @@ const App = () => {
 
   const handleSearchChange = (e) => {
     e.preventDefault()
-    setSearchString(e.target.value)
-    if (e.target.value) {
-      const searchName = e.target.value.toLowerCase().trim()
-      setVisiblePersons(visiblePersons.filter((p) => p.name.toLowerCase().includes(searchName)))
-    } else {
-      setVisiblePersons([...persons])
-    }
+    setSearchString(e.target.value.toLowerCase().trim())
   }
 
   return (
@@ -59,13 +50,13 @@ const App = () => {
       <h2>Phonebook</h2>
       <SearchInput handleSearchChange={handleSearchChange} searchString={searchString} />
       <PersonForm
-        handleSubmit={handleSubmit}
+        handleSubmit={handlePersonSubmit}
         handleNameChange={handleNameChange}
         handleNumberChange={handleNumberChange}
         name={newName}
         number={newNumber} />
       <h2>Numbers:</h2>
-      <PersonList persons={visiblePersons} />
+      <PersonList persons={persons} searchString={searchString} />
     </div>
   )
 
