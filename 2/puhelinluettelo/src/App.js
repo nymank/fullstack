@@ -21,7 +21,7 @@ const App = () => {
   }
 
 
-  // get starting state and update current state
+  // get starting state
   useEffect(getAndSetPersons, [])
 
   const resetInputs = () => {
@@ -49,11 +49,15 @@ const App = () => {
           })
       }
     } else if (!nameInPersons && !numberInPersons) {
+      // add new person
       personService.addPerson({ name: newName, number: newNumber })
         .then(newPerson => {
           setPersons(persons.concat(newPerson))
           resetInputs()
         })
+    } else if ( numberInPersons ){
+      resetInputs()
+      alert("Number already listed in phonebook")
     }
   }
 
