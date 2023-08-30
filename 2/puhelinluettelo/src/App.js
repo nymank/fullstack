@@ -1,10 +1,8 @@
 
 import { useState } from 'react'
 
-import Person from './components/Person'
 import PersonForm from './components/PersonForm'
 import SearchInput from './components/SearchInput'
-import PhonebookHeader from './components/PhonebookHeader'
 import PersonList from './components/PersonList'
 
 const App = () => {
