@@ -1,5 +1,6 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 import PersonForm from './components/PersonForm'
 import SearchInput from './components/SearchInput'
@@ -14,6 +15,21 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchString, setSearchString] = useState('')
+
+  useEffect(() => {
+    // get starting state
+    const URL = "http://localhost:3001/persons"
+    axios.get(URL)
+    .then((response) => {
+      console.log(response)
+      if( response.data) {
+        setPersons([...response.data])
+      }
+    })
+    .catch((err) => {
+      alert("Fetching phone numbers failed: ", err)
+    })
+  }, [])
 
   const handlePersonSubmit = (e) => {
     e.preventDefault()
