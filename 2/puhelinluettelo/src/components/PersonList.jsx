@@ -10,9 +10,9 @@ const PersonList = (props) => {
                 searchString ?
                     props.persons.filter(
                         person => person.name.toLowerCase().includes(searchString.toLowerCase().trim())
-                    ).map(p => <Person person={p} key={p.name} />)
+                    ).map(p => <Person person={p} key={p.name} onDeletePerson={props.onDeletePerson} />)
                     :
-                    props.persons.map(p => <Person person={p} key={p.name} />)
+                    props.persons.map(p => <Person person={p} key={p.name} onDeletePerson={props.onDeletePerson} />)
             }
         </div>
     )

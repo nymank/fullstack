@@ -1,44 +1,42 @@
 
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 
 import PersonForm from './components/PersonForm'
 import SearchInput from './components/SearchInput'
 import PersonList from './components/PersonList'
+import personService from './services/personService'
 
 const App = () => {
-  const testData = [
-    { name: 'Joe Mama', number: '000-000123424' },
-    { name: 'Duuds', number: '4321' }
-  ]
-  const [persons, setPersons] = useState([...testData])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchString, setSearchString] = useState('')
 
-  useEffect(() => {
-    // get starting state
-    const URL = "http://localhost:3001/persons"
-    axios.get(URL)
-    .then((response) => {
-      console.log(response)
-      if( response.data) {
-        setPersons([...response.data])
-      }
-    })
-    .catch((err) => {
-      alert("Fetching phone numbers failed: ", err)
-    })
-  }, [])
+  const getAndSetPersons = () => {
+    personService.getAllPersons()
+      .then(allPersons => setPersons([...allPersons]))
+      .catch((err) => {
+        alert("Fetching phone numbers failed: ", err)
+      })
+  }
+
+
+  // get starting state and update current state
+  useEffect(getAndSetPersons, [])
+
 
   const handlePersonSubmit = (e) => {
     e.preventDefault()
     if (!newName || !newNumber) return
-    if (persons.findIndex(p => p.name === newName) === -1) {
-      setPersons([...persons, { name: newName, number: newNumber }])
-      setSearchString("")
-      setNewName("")
-      setNewNumber("")
+    if (persons.findIndex(p => p.name === newName || p.number === newNumber) === -1) {
+      personService.addPerson({ name: newName, number: newNumber })
+        .then(newPerson => {
+          setPersons(persons.concat(newPerson))
+          setSearchString("")
+          setNewName("")
+          setNewNumber("")
+        })
+
     } else {
       alert(`${newName} is already added to phonebook`)
     }
@@ -59,6 +57,18 @@ const App = () => {
     setSearchString(e.target.value)
   }
 
+  const sendDeletePerson = (person) => {
+    if (window.confirm(`Are you sure you want to delete ${person.name}?`)) {
+      personService.deletePerson(person.id)
+        .then(deletedPerson => {
+          console.log(`${deletedPerson.name} removed from phonebook`)
+          getAndSetPersons()
+        })
+    }
+
+  }
+
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -70,7 +80,7 @@ const App = () => {
         name={newName}
         number={newNumber} />
       <h2>Numbers:</h2>
-      <PersonList persons={persons} searchString={searchString} />
+      <PersonList persons={persons} searchString={searchString} onDeletePerson={sendDeletePerson} />
     </div>
   )
 
