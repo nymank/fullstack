@@ -56,7 +56,7 @@ const App = () => {
 
   const handleSearchChange = (e) => {
     e.preventDefault()
-    setSearchString(e.target.value.toLowerCase().trim())
+    setSearchString(e.target.value)
   }
 
   return (
