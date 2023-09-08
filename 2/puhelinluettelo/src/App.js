@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import PersonForm from './components/PersonForm'
 import SearchInput from './components/SearchInput'
 import PersonList from './components/PersonList'
+import Error from './components/Error'
+import Notification from './components/Notification'
 import personService from './services/personService'
 
 const App = () => {
@@ -11,15 +13,26 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchString, setSearchString] = useState('')
+  const [notification, setNotification] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const STANDARD_POPUP_MSECS = 4000
 
   const getAndSetPersons = () => {
     personService.getAllPersons()
-      .then(allPersons => setPersons([...allPersons]))
-      .catch((err) => {
-        alert("Fetching phone numbers failed: ", err)
-      })
+      .then(allPersons => allPersons ? setPersons([...allPersons]): console.log("allPersons undefined"))
+      .catch(err => setErrorMessage(`Fetching persons failed: ${err}`))
   }
 
+  const showErrorPopup = (errMsg, msecs) => {
+    setErrorMessage(errMsg)
+    setTimeout(() => setErrorMessage(null), msecs)
+  }
+  
+  const showNotificationPopup = (notification, msecs) => {
+    setNotification(notification)
+    setTimeout(() => setNotification(null), msecs)
+  }
 
   // get starting state
   useEffect(getAndSetPersons, [])
@@ -46,7 +59,10 @@ const App = () => {
             copyPersons[nameIndex] = updatedPerson
             setPersons(copyPersons)
             resetInputs()
+            showNotificationPopup(`Number of ${updatedPerson.name} updated to ${updatedPerson.number}`, STANDARD_POPUP_MSECS)
+            setErrorMessage(null)
           })
+          .catch(err => showErrorPopup(`Updating person failed: ${err}`, STANDARD_POPUP_MSECS))
       }
     } else if (!nameInPersons && !numberInPersons) {
       // add new person
@@ -54,10 +70,17 @@ const App = () => {
         .then(newPerson => {
           setPersons(persons.concat(newPerson))
           resetInputs()
+          showNotificationPopup(`Added new person: ${newPerson.name}`, STANDARD_POPUP_MSECS)
+          setErrorMessage(null)
         })
-    } else if ( numberInPersons ){
+        .catch(err => {
+          setNotification(null)
+          showErrorPopup(`Adding new person failed: ${err}`, STANDARD_POPUP_MSECS)
+        })
+    } else if (numberInPersons) {
       resetInputs()
-      alert("Number already listed in phonebook")
+      setNotification(null)
+      showErrorPopup(`Number ${persons[numberIndex].number} is already listed in phonebook`, STANDARD_POPUP_MSECS)
     }
   }
 
@@ -80,17 +103,23 @@ const App = () => {
     if (window.confirm(`Are you sure you want to delete ${person.name}?`)) {
       personService.deletePerson(person.id)
         .then((deletedPerson) => {
-          console.log(`${person.name} removed from phonebook`)
           getAndSetPersons()
+          showNotificationPopup(`${person.name} removed from phonebook`, STANDARD_POPUP_MSECS)
+          setErrorMessage(null)
+        })
+        .catch(err => {
+          showErrorPopup(`Deleting person failed: ${err}`, STANDARD_POPUP_MSECS)
+          setNotification(null)
         })
     }
-
   }
 
 
   return (
     <div>
       <h2>Snooker professionals Phonebook</h2>
+      <Notification message={notification} />
+      <Error message={errorMessage} />
       <SearchInput handleSearchChange={handleSearchChange} searchString={searchString} />
       <PersonForm
         handleSubmit={handlePersonSubmit}
