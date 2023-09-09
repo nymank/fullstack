@@ -3,6 +3,8 @@ const express = require("express")
 
 const app = express()
 
+app.use(express.json())
+
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
@@ -56,3 +58,15 @@ app.delete("/api/persons/:id", (req, res) => {
     }
 })
 
+app.post("/api/persons", (req, res) => {
+    const newPerson = req.body
+    if( !newPerson ) {
+        res.status(400).end("Bad request, empty request body")
+    }
+    if( persons.findIndex(p => p.name === newPerson.name) === -1 ) {
+        persons.concat({...newPerson, id: Math.random(10000)})
+        res.status(201).json(newPerson)
+    } else {
+        res.status(400).end(`Person with name ${newPerson.name} already exists` )
+    }
+})
