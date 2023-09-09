@@ -16,7 +16,7 @@ const App = () => {
   const [notification, setNotification] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
-  const STANDARD_POPUP_MSECS = 4000
+  const STANDARD_POPUP_MSECS = 5000
 
   const getAndSetPersons = () => {
     personService.getAllPersons()
@@ -71,9 +71,7 @@ const App = () => {
           resetInputs()
           showNotificationPopup(`Added new person: ${newPerson.name}`, STANDARD_POPUP_MSECS)
         })
-        .catch(err => {
-          showErrorPopup(`Adding new person failed: ${err}`, STANDARD_POPUP_MSECS)
-        })
+        .catch(errRes => showErrorPopup(`Adding new person failed: ${errRes.statusText}`, STANDARD_POPUP_MSECS))
     } else if (numberInPersons) {
       resetInputs()
       showErrorPopup(`Number ${persons[numberIndex].number} is already listed in phonebook`, STANDARD_POPUP_MSECS)
