@@ -61,12 +61,18 @@ app.delete("/api/persons/:id", (req, res) => {
 app.post("/api/persons", (req, res) => {
     const newPerson = req.body
     if( !newPerson ) {
-        res.status(400).end("Bad request, empty request body")
+        const err = { errorMessage: `Empty request body` }
+        res.status(400).json(err)
+    } else if( !newPerson.number || !newPerson.name ) {
+        const err = { errorMessage: `Name and number are required` }
+        res.status(400).json(err)
     }
+
     if( persons.findIndex(p => p.name === newPerson.name) === -1 ) {
         persons.concat({...newPerson, id: Math.random(10000)})
         res.status(201).json(newPerson)
     } else {
-        res.status(400).end(`Person with name ${newPerson.name} already exists` )
+        const err = { errorMessage: `Person with name ${newPerson.name} already exists` }
+        res.status(400).json(err)
     }
 })
