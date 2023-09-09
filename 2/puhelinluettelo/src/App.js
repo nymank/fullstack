@@ -20,15 +20,15 @@ const App = () => {
 
   const getAndSetPersons = () => {
     personService.getAllPersons()
-      .then(allPersons => allPersons ? setPersons([...allPersons]): console.log("allPersons undefined"))
-      .catch(err => setErrorMessage(`Fetching persons failed: ${err}`))
+      .then(allPersons => allPersons ? setPersons([...allPersons]) : console.log("allPersons undefined"))
+      .catch(err => showErrorPopup(`Fetching persons failed: ${err}`, STANDARD_POPUP_MSECS))
   }
 
   const showErrorPopup = (errMsg, msecs) => {
     setErrorMessage(errMsg)
     setTimeout(() => setErrorMessage(null), msecs)
   }
-  
+
   const showNotificationPopup = (notification, msecs) => {
     setNotification(notification)
     setTimeout(() => setNotification(null), msecs)
@@ -60,7 +60,6 @@ const App = () => {
             setPersons(copyPersons)
             resetInputs()
             showNotificationPopup(`Number of ${updatedPerson.name} updated to ${updatedPerson.number}`, STANDARD_POPUP_MSECS)
-            setErrorMessage(null)
           })
           .catch(err => showErrorPopup(`Updating person failed: ${err}`, STANDARD_POPUP_MSECS))
       }
@@ -71,15 +70,12 @@ const App = () => {
           setPersons(persons.concat(newPerson))
           resetInputs()
           showNotificationPopup(`Added new person: ${newPerson.name}`, STANDARD_POPUP_MSECS)
-          setErrorMessage(null)
         })
         .catch(err => {
-          setNotification(null)
           showErrorPopup(`Adding new person failed: ${err}`, STANDARD_POPUP_MSECS)
         })
     } else if (numberInPersons) {
       resetInputs()
-      setNotification(null)
       showErrorPopup(`Number ${persons[numberIndex].number} is already listed in phonebook`, STANDARD_POPUP_MSECS)
     }
   }
@@ -102,14 +98,16 @@ const App = () => {
   const sendDeletePerson = (person) => {
     if (window.confirm(`Are you sure you want to delete ${person.name}?`)) {
       personService.deletePerson(person.id)
-        .then((deletedPerson) => {
+        .then((res) => {
+          if (res.status === 404) {
+            showErrorPopup(`Information of ${person.name}: has already been removed from the phonebook.`, STANDARD_POPUP_MSECS)
+          } else {
+            showNotificationPopup(`${person.name} removed from phonebook`, STANDARD_POPUP_MSECS)
+          }
           getAndSetPersons()
-          showNotificationPopup(`${person.name} removed from phonebook`, STANDARD_POPUP_MSECS)
-          setErrorMessage(null)
         })
-        .catch(err => {
-          showErrorPopup(`Deleting person failed: ${err}`, STANDARD_POPUP_MSECS)
-          setNotification(null)
+        .catch(errorResponse => {
+          showErrorPopup(`Deleting person failed: ${errorResponse.status} ${errorResponse.statusText}`, STANDARD_POPUP_MSECS)
         })
     }
   }
