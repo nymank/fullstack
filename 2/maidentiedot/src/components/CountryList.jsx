@@ -10,10 +10,6 @@ const CountryList = (props) => {
     
     const shownCountries = props.countries
 
-
-
-    
-
     return (
         <div>
             {

@@ -1,10 +1,13 @@
 import Capitals from "./Capitals"
 import Flag from "./Flag"
-
+import { useEffect } from "react"
+import Weather from "./Weather"
 
 const CountryProfile = (props) => {
 
     const country = props.country
+
+
 
     return (
         <div>
@@ -18,6 +21,7 @@ const CountryProfile = (props) => {
                 </ul>
             </div>
             <Flag country={country} />
+            <Weather country={country} />
         </div>
     )
 }
