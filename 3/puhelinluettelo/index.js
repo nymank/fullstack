@@ -27,8 +27,7 @@ let persons = [
         name: "Joe Mama",
         number: "123",
         id: 2
-    },
-
+    }
 ]
 
 app.get("/api/persons", (req, res) => {
