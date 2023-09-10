@@ -1,9 +1,10 @@
 const express = require("express")
-
+const morgan = require("morgan")
 
 const app = express()
 
 app.use(express.json())
+app.use(morgan("tiny"))
 
 const PORT = 3001
 app.listen(PORT, () => {
@@ -69,7 +70,7 @@ app.post("/api/persons", (req, res) => {
     }
 
     if( persons.findIndex(p => p.name === newPerson.name) === -1 ) {
-        persons.concat({...newPerson, id: Math.random(10000)})
+        persons = persons.concat({...newPerson, id: Math.floor(10000*Math.random())})
         res.status(201).json(newPerson)
     } else {
         const err = { errorMessage: `Person with name ${newPerson.name} already exists` }
