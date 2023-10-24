@@ -54,6 +54,10 @@ app.get("/info", (req, res) => {
 
 app.delete("/api/persons/:id", (req, res) => {
     const id = Number(req.params.id)
+    if( !id )  {
+        res.status(400).end("Person ID must be specified")
+    }
+
     const person = persons.find(p => p.id === id)
     if( person ) {
         persons = persons.filter(p => p.id !== id)
@@ -66,10 +70,13 @@ app.delete("/api/persons/:id", (req, res) => {
 app.post("/api/persons", (req, res) => {
     const newPerson = req.body
     if( !newPerson ) {
-        const err = { errorMessage: `Empty request body` }
+        const err = { errorMessage: "Empty request body" }
         res.status(400).json(err)
     } else if( !newPerson.number || !newPerson.name ) {
-        const err = { errorMessage: `Name and number are required` }
+        const err = { errorMessage: "Name and number are required" }
+        res.status(400).json(err)
+    } else if ( newPerson.id ) {
+        const err = { errorMessage: "id field cannot be specified in request body" }
         res.status(400).json(err)
     }
 

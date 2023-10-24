@@ -119,7 +119,7 @@ const App = () => {
 
   return (
     <div>
-      <h2>Snooker professionals Phonebook</h2>
+      <h2>Phonebook</h2>
       <Notification message={notification} />
       <Error message={errorMessage} />
       <SearchInput handleSearchChange={handleSearchChange} searchString={searchString} />
