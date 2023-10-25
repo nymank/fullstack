@@ -99,3 +99,28 @@ app.post("/api/persons", (req, res) => {
             }
         }).catch(err => res.status(500).end(err))
 })
+
+// not required yet, still adding it because why not
+app.put("/api/persons/:id", (req, res) => {
+    const searchId = req.params.id
+    const payload = req.body
+    if (!searchId) {
+        res.status(400).end("Person ID must be specified")
+    }
+    Person.findByIdAndUpdate(searchId, { number: payload.number })
+        .then((updatedPerson) => {
+            if( updatedPerson) {
+                updatedPerson.number = payload.number // updated person has old number for some reason, so we have to do this
+                res.status(200).json(updatedPerson)
+            } else {
+                res.status(404).end("Not Found")
+            }
+        }).catch(err => {
+            console.error(err)
+            if (err.name == "CastError") {
+                res.status(400).end("Wrong ID format")
+            } else {
+                res.status(500).end(JSON.stringify(err))
+            }
+        })
+})

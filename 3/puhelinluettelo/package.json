@@ -4,10 +4,10 @@
   "description": "FullStack Open 2023 3. kierros",
   "main": "index.js",
   "scripts": {
+    "build:ui": "npm install && cd frontend && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "build:ui": "npm install && cd frontend && npm install && npm run build",
+    "dev": "npm run build:ui && nodemon index.js",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "author": "Kalle Nyman",
