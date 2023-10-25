@@ -30,7 +30,7 @@ app.get("/api/persons/:id", (req, res) => {
     const searchId = req.params.id
     Person.findById(searchId)
         .then(foundPerson => {
-            if( !foundPerson ) {
+            if (!foundPerson) {
                 res.status(404).end("Not found")
             } else {
                 res.json(foundPerson)
@@ -76,11 +76,17 @@ app.post("/api/persons", (req, res) => {
         res.status(400).json(err)
     }
 
-    if (persons.findIndex(p => p.name === newPerson.name) === -1) {
-        persons = persons.concat({ ...newPerson, id: Math.floor(10000 * Math.random()) })
-        res.status(201).json(newPerson)
-    } else {
-        const err = { errorMessage: `Person with name ${newPerson.name} already exists` }
-        res.status(400).json(err)
-    }
+    Person.find({ name: newPerson.name })
+        .then(foundPerson => {
+            const nameNotInPhonebook = (typeof foundPerson === 'object' && foundPerson.length === 0)
+            if (nameNotInPhonebook) {
+                const person = new Person(newPerson)
+                person.save().then(result => {
+                    res.status(201).json(result)
+                })
+            } else {
+                const err = { errorMessage: `Person with name ${newPerson.name} already exists` }
+                res.status(400).json(err)
+            }
+        })
 })
