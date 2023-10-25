@@ -36,7 +36,7 @@ app.get("/api/persons/:id", (req, res) => {
                 res.json(foundPerson)
             }
         }).catch(err => {
-            res.status(404).end(err)
+            res.status(500).end(err)
             console.log(err)
         })
 })
@@ -49,31 +49,41 @@ app.get("/info", (req, res) => {
 })
 
 app.delete("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id)
-    if (!id) {
+    const searchId = req.params.id
+    if (!searchId) {
         res.status(400).end("Person ID must be specified")
     }
 
-    const person = persons.find(p => p.id === id)
-    if (person) {
-        persons = persons.filter(p => p.id !== id)
-        res.status(200).end("Deleted")
-    } else {
-        res.status(404).end("Not Found")
-    }
+    Person.findByIdAndRemove(searchId)
+        .then(foundPerson => {
+            if (foundPerson) {
+                res.status(200).end("Deleted")
+            } else {
+                res.status(404).end("Not Found")
+            }
+
+        }).catch(err => {
+            if (err.name == "CastError") {
+                res.status(400).end("Wrong ID format")
+            } else {
+                res.status(500).end()
+            }
+        })
 })
+
+
 
 app.post("/api/persons", (req, res) => {
     const newPerson = req.body
     if (!newPerson) {
-        const err = { errorMessage: "Empty request body" }
-        res.status(400).json(err)
+        const err = "Empty request body"
+        res.status(400).end(err)
     } else if (!newPerson.number || !newPerson.name) {
-        const err = { errorMessage: "Name and number are required" }
-        res.status(400).json(err)
+        const err = "Name and number are required"
+        res.status(400).end(err)
     } else if (newPerson.id) {
-        const err = { errorMessage: "id field cannot be specified in request body" }
-        res.status(400).json(err)
+        const err = "id field cannot be specified in request body"
+        res.status(400).end(err)
     }
 
     Person.find({ name: newPerson.name })
@@ -85,8 +95,7 @@ app.post("/api/persons", (req, res) => {
                     res.status(201).json(result)
                 })
             } else {
-                const err = { errorMessage: `Person with name ${newPerson.name} already exists` }
-                res.status(400).json(err)
+                res.status(400).end(`Person with name '${newPerson.name}' already exists`)
             }
-        })
+        }).catch(err => res.status(500).end(err))
 })
