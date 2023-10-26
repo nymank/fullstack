@@ -90,6 +90,9 @@ app.post("/api/persons", (req, res) => {
                 const person = new Person(newPerson)
                 person.save().then(result => {
                     res.status(201).json(result)
+                }).catch(err => {
+                    console.error(err)
+                    res.status(500).json(err)
                 })
             } else {
                 res.status(400).end(`Person with name '${newPerson.name}' already exists`)
@@ -117,7 +120,7 @@ app.put("/api/persons/:id", (req, res) => {
             if (err.name == "CastError") {
                 res.status(400).end("Wrong ID format")
             } else {
-                res.status(500).end(JSON.stringify(err))
+                res.status(500).json(err)
             }
         })
 })
