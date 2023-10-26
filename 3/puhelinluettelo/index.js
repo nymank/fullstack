@@ -76,14 +76,11 @@ app.delete("/api/persons/:id", (req, res) => {
 app.post("/api/persons", (req, res) => {
     const newPerson = req.body
     if (!newPerson) {
-        const err = "Empty request body"
-        res.status(400).end(err)
+        res.status(400).end("Empty request body")
     } else if (!newPerson.number || !newPerson.name) {
-        const err = "Name and number are required"
-        res.status(400).end(err)
+        res.status(400).end("Name and number are required")
     } else if (newPerson.id) {
-        const err = "id field cannot be specified in request body"
-        res.status(400).end(err)
+        res.status(400).end("id field cannot be specified in request body")
     }
 
     Person.find({ name: newPerson.name })
@@ -124,3 +121,4 @@ app.put("/api/persons/:id", (req, res) => {
             }
         })
 })
+
