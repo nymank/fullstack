@@ -67,17 +67,27 @@ const App = () => {
             resetInputs()
             showNotificationPopup(`Number of ${updatedPerson.name} updated to ${updatedPerson.number}`, STANDARD_POPUP_MSECS)
           })
-          .catch(err => showErrorPopup(`Updating person failed: ${err}`, STANDARD_POPUP_MSECS))
+          .catch(err => {
+            console.error(err)
+            showErrorPopup(`Updating person failed: ${err}`, STANDARD_POPUP_MSECS)
+          })
       }
     } else if (!nameInPersons && !numberInPersons) {
       // add new person
       personService.addPerson({ name: newName, number: newNumber })
-        .then(newPerson => {
-          setPersons(persons.concat(newPerson))
-          resetInputs()
-          showNotificationPopup(`Added new person: ${newPerson.name}`, STANDARD_POPUP_MSECS)
+        .then(response => {
+          console.log("response", response)
+          if( response.data.error ) {
+            console.log("response.data.error", response)
+            resetInputs()
+            showErrorPopup(`Adding new person failed: ${response.data.error}`, STANDARD_POPUP_MSECS)
+          } else {
+            setPersons(persons.concat(response))
+            resetInputs()
+            showNotificationPopup(`Added new person: ${response.name}`, STANDARD_POPUP_MSECS)
+          }
         })
-        .catch(errRes => showErrorPopup(`Adding new person failed: ${errRes.statusText}`, STANDARD_POPUP_MSECS))
+        .catch(errRes => showErrorPopup(`Addingaaa new person failed: ${errRes.statusText}`, STANDARD_POPUP_MSECS))
     } else if (numberInPersons) {
       resetInputs()
       showErrorPopup(`Number ${persons[numberIndex].number} is already listed in phonebook`, STANDARD_POPUP_MSECS)

@@ -98,8 +98,11 @@ app.put("/api/persons/:id", (req, res, next) => {
     if (!searchId) {
         res.status(400).end("Person ID must be specified")
     }
-    Person.findByIdAndUpdate(searchId, { number: payload.number })
-        .then((updatedPerson) => {
+    Person.findByIdAndUpdate(
+        searchId,
+        { number: payload.number },
+        { new: true, runValidators: true, context: 'query' }
+        ).then((updatedPerson) => {
             if (updatedPerson) {
                 updatedPerson.number = payload.number
                 res.status(200).json(updatedPerson)
@@ -115,6 +118,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(400).send("Wrong ID format")
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error)
