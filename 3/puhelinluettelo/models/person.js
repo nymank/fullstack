@@ -24,24 +24,3 @@ personSchema.set('toJSON', {
 })
 
 module.exports = mongoose.model("Person", personSchema)
-
-//     } else if (process.argv.length === 5) {
-//         const person = new Person({
-//             name: process.argv[3],
-//             number: process.argv[4]
-//         })
-
-//         person.save().then(result => {
-//             console.log("person saved!")
-//             mongoose.connection.close()
-//         })
-//     } else if (process.argv.length > 5) {
-//         console.log('too many arguments! (remember to use hyphens "" around the name)')
-//         mongoose.connection.close()
-//     }
-
-
-
-// } catch (err) {
-//     console.error("Error querying database", err)
-// }

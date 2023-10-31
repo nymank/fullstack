@@ -4,11 +4,11 @@ const app = express()
 const morgan = require("morgan")
 const cors = require("cors")
 const Person = require("./models/person")
-
+// middlewares
 app.use(cors())
 app.use(express.json())
 app.use(express.static("frontend/build"))
-morgan.token("req-body", function (req, res) { return JSON.stringify(req.body) })
+morgan.token("req-body", function (req, res, next) { return JSON.stringify(req.body) })
 app.use(morgan(":method :url :status :total-time[0] - :response-time ms :req-body"))
 
 const PORT = process.env.PORT
@@ -16,17 +16,18 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}!`)
 })
 
-app.get("/api/persons", (req, res) => {
+app.get("/api/persons", (req, res, next) => {
     Person.find({})
         .then((allPersons) => {
-            res.json(allPersons)
-        }).catch((err) => {
-            console.error(err)
-            res.status(404).end(err)
-        })
+            if (allPersons) {
+                res.json(allPersons)
+            } else {
+                res.status(404).end("Not Found")
+            }
+        }).catch(err => next(err))
 })
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
     const searchId = req.params.id
     Person.findById(searchId)
         .then(foundPerson => {
@@ -35,20 +36,17 @@ app.get("/api/persons/:id", (req, res) => {
             } else {
                 res.json(foundPerson)
             }
-        }).catch(err => {
-            res.status(500).end(err)
-            console.log(err)
-        })
+        }).catch(err => next(err))
 })
 
-app.get("/info", (req, res) => {
+app.get("/info", (req, res, next) => {
     Person.find({})
         .then((allPersons) => {
             res.end(`Phonebook has info for ${allPersons.length} people.\n${Date(Date.now())}`)
-        }).catch((err) => console.error(err))
+        }).catch(err => next(err))
 })
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
     const searchId = req.params.id
     if (!searchId) {
         res.status(400).end("Person ID must be specified")
@@ -62,18 +60,12 @@ app.delete("/api/persons/:id", (req, res) => {
                 res.status(404).end("Not Found")
             }
 
-        }).catch(err => {
-            if (err.name == "CastError") {
-                res.status(400).end("Wrong ID format")
-            } else {
-                res.status(500).end()
-            }
-        })
+        }).catch(err => next(err))
 })
 
 
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
     const newPerson = req.body
     if (!newPerson) {
         res.status(400).end("Empty request body")
@@ -87,21 +79,20 @@ app.post("/api/persons", (req, res) => {
         .then(foundPerson => {
             const nameNotInPhonebook = (typeof foundPerson === 'object' && foundPerson.length === 0)
             if (nameNotInPhonebook) {
+                newPerson.name = newPerson.name.trim()
+                newPerson.number = newPerson.number.trim()
                 const person = new Person(newPerson)
                 person.save().then(result => {
                     res.status(201).json(result)
-                }).catch(err => {
-                    console.error(err)
-                    res.status(500).json(err)
-                })
+                }).catch(err => next(err))
             } else {
                 res.status(400).end(`Person with name '${newPerson.name}' already exists`)
             }
-        }).catch(err => res.status(500).end(err))
+        }).catch(err => next(err))
 })
 
 // not required yet, still adding it because why not
-app.put("/api/persons/:id", (req, res) => {
+app.put("/api/persons/:id", (req, res, next) => {
     const searchId = req.params.id
     const payload = req.body
     if (!searchId) {
@@ -109,19 +100,25 @@ app.put("/api/persons/:id", (req, res) => {
     }
     Person.findByIdAndUpdate(searchId, { number: payload.number })
         .then((updatedPerson) => {
-            if( updatedPerson) {
-                updatedPerson.number = payload.number // updated person has old number for some reason, so we have to do this
+            if (updatedPerson) {
+                updatedPerson.number = payload.number
                 res.status(200).json(updatedPerson)
             } else {
                 res.status(404).end("Not Found")
             }
-        }).catch(err => {
-            console.error(err)
-            if (err.name == "CastError") {
-                res.status(400).end("Wrong ID format")
-            } else {
-                res.status(500).json(err)
-            }
-        })
+        }).catch(err => next(err))
 })
 
+// error handler express middware function
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send("Wrong ID format")
+    }
+
+    next(error)
+}
+
+
+app.use(errorHandler) // viimeisenä
