@@ -16,10 +16,35 @@ const personSchema = new mongoose.Schema({
         minlength: 3,
         required: true
     },
-    number: String,
+    number: {
+        type: String,
+        minlength: 8,
+        validate: function (value) {
+            const parts = value.split("-")
+            if (parts.length !== 2) {
+                return false
+            }
+
+            const firstPart = parts[0]
+            const secondPart = parts[1]
+
+            if (firstPart.length !== 2 && firstPart.length !== 3) {
+                return false
+            }
+            const min = 8
+            if(secondPart.length < min-firstPart.length) {
+                console.log(secondPart.length < min-firstPart.length)
+                console.log(secondPart.length, min-firstPart.length)
+                return false
+            }
+            console.log("return true")
+            return true
+        },
+        required: true
+    }
 })
 
-personSchema.set('toJSON', {
+personSchema.set("toJSON", {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()
         delete returnedObject._id

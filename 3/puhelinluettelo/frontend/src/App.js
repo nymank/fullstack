@@ -77,17 +77,18 @@ const App = () => {
       personService.addPerson({ name: newName, number: newNumber })
         .then(response => {
           console.log("response", response)
-          if( response.data.error ) {
-            console.log("response.data.error", response)
-            resetInputs()
-            showErrorPopup(`Adding new person failed: ${response.data.error}`, STANDARD_POPUP_MSECS)
-          } else {
-            setPersons(persons.concat(response))
-            resetInputs()
-            showNotificationPopup(`Added new person: ${response.name}`, STANDARD_POPUP_MSECS)
-          }
+
+          setPersons(persons.concat(response))
+          resetInputs()
+          showNotificationPopup(`Added new person: ${response.name}`, STANDARD_POPUP_MSECS)
+          
         })
-        .catch(errRes => showErrorPopup(`Addingaaa new person failed: ${errRes.statusText}`, STANDARD_POPUP_MSECS))
+        .catch(errRes => {
+          console.log("errRes", errRes.response.data.error)
+
+          showErrorPopup(`Adding a new person failed: ${errRes.response.data.error}`, STANDARD_POPUP_MSECS)
+
+        })
     } else if (numberInPersons) {
       resetInputs()
       showErrorPopup(`Number ${persons[numberIndex].number} is already listed in phonebook`, STANDARD_POPUP_MSECS)
