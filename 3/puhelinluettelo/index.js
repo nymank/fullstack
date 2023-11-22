@@ -8,7 +8,7 @@ const Person = require("./models/person")
 app.use(cors())
 app.use(express.json())
 app.use(express.static("frontend/build"))
-morgan.token("req-body", function (req, res, next) { return JSON.stringify(req.body) })
+morgan.token("req-body", function (req) { return JSON.stringify(req.body) })
 app.use(morgan(":method :url :status :total-time[0] - :response-time ms :req-body"))
 
 const PORT = process.env.PORT

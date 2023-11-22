@@ -41,4 +41,5 @@ const updatePerson = (newPerson) => {
         })
 }
 
-export default { addPerson, getAllPersons, deletePerson, updatePerson }
+const exportObj = { addPerson, getAllPersons, deletePerson, updatePerson }
+export default exportObj
