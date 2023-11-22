@@ -75,7 +75,7 @@ const App = () => {
             }
           })
           .catch(err => {
-            console.error("örrööööörö",err)
+            console.error(err)
             showErrorPopup(`Updating person failed: ${err}`, STANDARD_POPUP_MSECS)
           })
       }
