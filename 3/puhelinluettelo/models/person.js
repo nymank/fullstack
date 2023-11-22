@@ -37,7 +37,6 @@ const personSchema = new mongoose.Schema({
                 console.log(secondPart.length, min-firstPart.length)
                 return false
             }
-            console.log("return true")
             return true
         },
         required: true

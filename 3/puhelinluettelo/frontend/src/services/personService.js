@@ -32,7 +32,10 @@ const deletePerson = (id) => {
 const updatePerson = (newPerson) => {
     const URL = `${BASE_SERVER_URL}/persons/${newPerson.id}`
     return axios.put(URL, newPerson)
-        .then(res => res.data)
+        .then(res => {
+            console.log(res)
+            return res.data
+        })
         .catch(err => {
             return err.response
         })

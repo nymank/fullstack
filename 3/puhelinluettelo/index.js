@@ -91,7 +91,6 @@ app.post("/api/persons", (req, res, next) => {
         }).catch(err => next(err))
 })
 
-// not required yet, still adding it because why not
 app.put("/api/persons/:id", (req, res, next) => {
     const searchId = req.params.id
     const payload = req.body
@@ -102,28 +101,37 @@ app.put("/api/persons/:id", (req, res, next) => {
         searchId,
         { number: payload.number },
         { new: true, runValidators: true, context: 'query' }
-        ).then((updatedPerson) => {
-            if (updatedPerson) {
-                updatedPerson.number = payload.number
-                res.status(200).json(updatedPerson)
-            } else {
-                res.status(404).end("Not Found")
-            }
-        }).catch(err => next(err))
+    ).then((updatedPerson) => {
+        if (updatedPerson) {
+            updatedPerson.number = payload.number
+            res.status(200).json(updatedPerson)
+        } else {
+            res.status(404).end("Not Found")
+        }
+    }).catch(err => next(err))
 })
 
 // error handler express middware function
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
+    // console.error(error.message)
 
     if (error.name === 'CastError') {
         return response.status(400).send("Wrong ID format")
     } else if (error.name === 'ValidationError') {
-        return response.status(400).json({ error: error.message })
+        if (error.errors.number) {
+            if (error.errors.number.properties.type === "user defined") {
+                console.log(JSON.stringify(error.errors.number))
+                return response.status(400).json({ error: "Number must contain two parts separated by a hyphen '-'. First part must be two or three numbers long." })
+            } else if (error.errors.number.properties.type === "minlength") {
+                return response.status(400).json({ error: error.message })
+            }
+        } else {
+            return response.status(400).json({ error: error.message })
+        }
     }
 
     next(error)
 }
 
-//
+
 app.use(errorHandler) // viimeisenä

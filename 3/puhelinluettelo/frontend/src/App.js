@@ -61,14 +61,21 @@ const App = () => {
       if (window.confirm(`${newName} is already in the phonebook. Would you like to update their number to ${newNumber}?`)) {
         personService.updatePerson({ ...persons[nameIndex], number: newNumber })
           .then(updatedPerson => {
-            const copyPersons = [...persons]
-            copyPersons[nameIndex] = updatedPerson
-            setPersons(copyPersons)
-            resetInputs()
-            showNotificationPopup(`Number of ${updatedPerson.name} updated to ${updatedPerson.number}`, STANDARD_POPUP_MSECS)
+            if( updatedPerson.data ) {
+              if( updatedPerson.data.error ) {
+                console.error(updatedPerson.data)
+                showErrorPopup(`Updating person failed: ${updatedPerson.data.error}`, STANDARD_POPUP_MSECS)
+              }
+            } else {
+              const copyPersons = [...persons]
+              copyPersons[nameIndex] = updatedPerson
+              setPersons(copyPersons)
+              resetInputs()
+              showNotificationPopup(`Number of ${updatedPerson.name} updated to ${updatedPerson.number}`, STANDARD_POPUP_MSECS)
+            }
           })
           .catch(err => {
-            console.error(err)
+            console.error("örrööööörö",err)
             showErrorPopup(`Updating person failed: ${err}`, STANDARD_POPUP_MSECS)
           })
       }
