@@ -1,2 +1,2 @@
 # FullStack
-Repositorio tehtävien palauttamiseen Helsingin Yliopiston Fullstack-kurssille 2021 / 2023.
+Repositorio tehtävien palauttamiseen Helsingin Yliopiston Fullstack Open -kurssille
