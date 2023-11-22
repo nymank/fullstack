@@ -32,9 +32,9 @@ const personSchema = new mongoose.Schema({
 				return false
 			}
 			const min = 8
-			if(secondPart.length < min-firstPart.length) {
-				console.log(secondPart.length < min-firstPart.length)
-				console.log(secondPart.length, min-firstPart.length)
+			if (secondPart.length < min - firstPart.length) {
+				console.log(secondPart.length < min - firstPart.length)
+				console.log(secondPart.length, min - firstPart.length)
 				return false
 			}
 			return true
