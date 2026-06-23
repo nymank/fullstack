@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "node --test",    
+    "test": "node --test",
     "lint": "eslint ."
   },
   "author": "Kalle Nyman",
@@ -18,8 +18,9 @@
     "mongoose": "^7.6.5"
   },
   "devDependencies": {
-    "eslint": "^8.54.0",
-    "morgan": "^1.10.0",
-    "nodemon": "^3.0.1"
+    "eslint": "^8.57.1",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.8.4",
+    "prettier-eslint": "^17.1.1"
   }
 }
