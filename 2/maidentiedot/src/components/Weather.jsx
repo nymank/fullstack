@@ -15,7 +15,10 @@ const Weather = (props) => {
 
     const getCapitalWeather = () => {
         console.log(country)
-        countryService.getWeather(country.capitalInfo["latlng"][0], country.capitalInfo["latlng"][1], process.env.REACT_APP_WEATHER_API_KEY)
+        countryService.getWeather(
+            country.capitalInfo["latlng"][0], 
+            country.capitalInfo["latlng"][1],
+            process.env.REACT_APP_WEATHER_API_KEY)
             .then(weatherData => updateWeather(weatherData.current))
             .catch(err => console.error(err))
     }
@@ -44,6 +47,7 @@ const Weather = (props) => {
             case "thunderstorm": return `11${nORd}`
             case "snow": return `13${nORd}`
             case "mist": return `50${nORd}`
+            default: return 
         }
     }
 
