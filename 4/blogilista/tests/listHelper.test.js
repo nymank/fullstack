@@ -20,11 +20,18 @@ describe("List helper tests", () => {
 			likes: 2,
 		},
 		{
+			_id: "6a3acbd36d6650ba96637655",
+			title: "Nuuskiksen blogi 2",
+			author: "Nuuskamuikkunen",
+			url: "https://nuuskiksenblogi.fi",
+			likes: 3,
+		},
+		{
 			_id: "6a3acbf1823bcdbd3361c53c",
 			title: "Muumipeikon blogi",
 			author: "Muumipeikko",
 			url: "https://muumipeikonblogi.fi",
-			likes: 3,
+			likes: 4,
 		},
 	].sort((a, b) => a.likes - b.likes)
 
@@ -40,7 +47,7 @@ describe("List helper tests", () => {
 
 	test("correctly calculates total likes of multiple blogs", () => {
 		const result = listHelper.totalLikes(blogs)
-		assert.strictEqual(result, 6)
+		assert.strictEqual(result, 10)
 	})
 
 	test("returns the favourite blog", () => {
@@ -48,8 +55,13 @@ describe("List helper tests", () => {
 		assert.deepStrictEqual(result, blogs[blogs.length-1])
 	})
 
-	test("favoriteBlog returns the null if empty blogs", () => {
+	test("favoriteBlog returns the null if blogs is empty", () => {
 		const result = listHelper.favoriteBlog([])
 		assert.strictEqual(result, null)
+	})
+
+	test("returns author with the most blogs", () => {
+		const result = listHelper.mostBlogs(blogs)
+		assert.deepStrictEqual(result, {author: "Nuuskamuikkunen", blogs: 2})
 	})
 })
