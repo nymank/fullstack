@@ -62,6 +62,11 @@ describe("List helper tests", () => {
 
 	test("returns author with the most blogs", () => {
 		const result = listHelper.mostBlogs(blogs)
-		assert.deepStrictEqual(result, {author: "Nuuskamuikkunen", blogs: 2})
+		assert.deepStrictEqual(result, { author: "Nuuskamuikkunen", blogs: 2 })
+	})
+
+	test("returns author with the most likes", () => {
+		const result = listHelper.mostLikes(blogs)
+		assert.deepStrictEqual(result, { author: "Nuuskamuikkunen", likes: 5 })
 	})
 })
