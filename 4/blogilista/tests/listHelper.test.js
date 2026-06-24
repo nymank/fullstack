@@ -26,7 +26,7 @@ describe("List helper tests", () => {
 			url: "https://muumipeikonblogi.fi",
 			likes: 3,
 		},
-	]
+	].sort((a, b) => a.likes - b.likes)
 
 	test("likes of empty list is 0", () => {
 		const result = listHelper.totalLikes([])
@@ -41,5 +41,15 @@ describe("List helper tests", () => {
 	test("correctly calculates total likes of multiple blogs", () => {
 		const result = listHelper.totalLikes(blogs)
 		assert.strictEqual(result, 6)
+	})
+
+	test("returns the favourite blog", () => {
+		const result = listHelper.favoriteBlog(blogs)
+		assert.deepStrictEqual(result, blogs[blogs.length-1])
+	})
+
+	test("favoriteBlog returns the null if empty blogs", () => {
+		const result = listHelper.favoriteBlog([])
+		assert.strictEqual(result, null)
 	})
 })
