@@ -1,10 +1,5 @@
-const logger = require("./logger")
-
-const dummy = (blogs) => {
-	logger.info(blogs)
-	return 1    
-}
+const totalLikes = (blogs) => blogs.reduce((acc, curr) => acc += curr.likes, 0)
 
 module.exports = {
-	dummy
+	totalLikes
 }
