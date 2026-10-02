@@ -35,8 +35,6 @@ const mostLikes = (blogs) => {
 		return acc
 	}, {})
 
-	console.log(counts)
-
 	const [author, likes] = Object.entries(counts).reduce(
 		(max, current) => current[1] > max[1] ? current : max
 	)

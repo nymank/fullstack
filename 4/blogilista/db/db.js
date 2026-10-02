@@ -1,11 +1,12 @@
 const mongoose = require("mongoose")
 const config = require("../utils/config")
+const logger = require("../utils/logger")
 
 const connectToMongo = () => {
 	const url = config.MONGODB_URI
 	mongoose.connect(url)
 		.then(() => {
-			console.log("Connected to MongoDB")
+			logger.info("Connected to MongoDB")
 		}).catch(err => {
 			console.error(err)
 			process.exit(1)
