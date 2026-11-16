@@ -16,8 +16,10 @@ const errorHandler = (error, request, response, next) => {
 	logger.error(error)
 
 	if (error.name === "CastError") {
-		return response.status(400).json({ error: "malformatted id" })
+		return response.status(400).json({ error: "Malformatted id" })
 	} else if (error.name === "ValidationError") {
+		return response.status(400).json({ error: error.message })
+	} else if (error.name === "SyntaxError") {
 		return response.status(400).json({ error: error.message })
 	}
 	return response.status(500).json({error: "Internal server error"})

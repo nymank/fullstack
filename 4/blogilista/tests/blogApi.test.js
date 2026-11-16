@@ -125,6 +125,41 @@ test("POST fails if required fields are not present", async () => {
     assert.strictEqual(response.body.length, initialBlogs.length)
 })
 
+test("a blog can be deleted", async () => {
+    const getBlogsRes = await api.get("/api/blogs")
+    const blogs = getBlogsRes.body
+
+    await api
+        .delete(`/api/blogs/${blogs[0].id}`)
+        .expect(204)
+    
+    const getBlogsRes2 = await api.get("/api/blogs")
+    const blogs2 = getBlogsRes2.body
+    assert.strictEqual(blogs2.length, initialBlogs.length - 1)
+})
+
+test("delete fails if id is in the wrong format", async () => {
+    const getBlogsRes = await api.get("/api/blogs")
+    const blogs = getBlogsRes.body
+
+    await api
+        .delete(`/api/blogs/${blogs[0].id}X`)
+        .expect(400)
+})
+
+test("delete returns status 204 on deleting nonexistent resource", async () => {
+    const getBlogsRes = await api.get("/api/blogs")
+    const blogs = getBlogsRes.body
+
+    await api
+        .delete(`/api/blogs/${blogs[0].id}`)
+        .expect(204)
+
+    await api
+        .delete(`/api/blogs/${blogs[0].id}`)
+        .expect(204)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
