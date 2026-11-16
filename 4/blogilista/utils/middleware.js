@@ -21,10 +21,10 @@ const errorHandler = (error, request, response, next) => {
 		return response.status(400).json({ error: error.message })
 	} else if (error.name === "SyntaxError") {
 		return response.status(400).json({ error: error.message })
-	} else if (error.name === "MongoServerError" && error.code === 11000 && error.keyPattern.username) {
+	} else if (error.name === "MongoServerError" && error.code === 11000 && error.keyPattern.username && error.message.includes("E11000 duplicate key error")) {
 		return response.status(400).json({ error: "Username already exists" })
 	}
-	return response.status(500).json({error: "Internal server error"})
+	return response.status(500).json({ error: "Internal server error" })
 }
 
 module.exports = {
