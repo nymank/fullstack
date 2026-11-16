@@ -21,6 +21,8 @@ const errorHandler = (error, request, response, next) => {
 		return response.status(400).json({ error: error.message })
 	} else if (error.name === "SyntaxError") {
 		return response.status(400).json({ error: error.message })
+	} else if (error.name === "MongoServerError" && error.code === 11000 && error.keyPattern.username) {
+		return response.status(400).json({ error: "Username already exists" })
 	}
 	return response.status(500).json({error: "Internal server error"})
 }
