@@ -89,6 +89,26 @@ test("a new blog can be added", async () => {
     assert.strictEqual(addedBlog.likes, postBlog.likes)
 })
 
+test("if 'likes' is undefined when POSTing, it's set to 0", async () => {
+    const postBlog = {
+        title: "Test blog 4",
+        author: "John Miller",
+        url: "https://notarealblog.com/johnmiller",
+    }
+
+    const postRes = await api
+        .post("/api/blogs")
+        .send(postBlog)
+        .expect(201)
+        .expect("Content-Type", /application\/json/)
+
+    const getBlogsRes = await api.get("/api/blogs")
+    const blogs = getBlogsRes.body
+    const addedBlog = blogs.find(blog => blog.id === postRes.body.id)
+    assert.strictEqual(addedBlog.likes, 0)
+
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
