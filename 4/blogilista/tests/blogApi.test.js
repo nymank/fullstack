@@ -109,6 +109,22 @@ test("if 'likes' is undefined when POSTing, it's set to 0", async () => {
 
 })
 
+test("POST fails if required fields are not present", async () => {
+    const postBlog = {
+        author: "John Miller",
+        likes: 10,
+    }
+
+    await api
+        .post("/api/blogs")
+        .send(postBlog)
+        .expect(400)
+
+    const response = await api.get("/api/blogs")
+
+    assert.strictEqual(response.body.length, initialBlogs.length)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })

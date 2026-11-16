@@ -9,13 +9,13 @@ db.connectToMongo()
 app.use(cors())
 app.use(express.json())
 
-app.use(middleware.requestLogger)
-app.use(middleware.errorHandler)
 
 // routes
 app.use("/api/blogs", blogRouter)
 
-app.use(middleware.unknownEndpoint)
+app.use(middleware.requestLogger)
+app.use(middleware.errorHandler)
 
+app.use(middleware.unknownEndpoint)
 
 module.exports = app
