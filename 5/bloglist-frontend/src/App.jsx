@@ -3,14 +3,20 @@ import { useState, useEffect } from "react"
 import Blog from "./components/Blog"
 import blogService from "./services/blogService"
 import loginService from "./services/loginService"
+import "./App.css"
+import Notification from "./components/Notification"
 
 const App = () => {
 	const [blogs, setBlogs] = useState([])
 	const [user, setUser] = useState(null)
 	const [username, setUsername] = useState("")
 	const [password, setPassword] = useState("")
-	const [errorMessage, setErrorMessage] = useState("")
 	const userLocalStorageKey = "loggedUser"
+	const [title, setTitle] = useState("")
+	const [author, setAuthor] = useState("")
+	const [url, setUrl] = useState("")
+	const [notificationType, setNotificationType] = useState("error")
+	const [notificationMessage, setNotificationMessage] = useState("")
 
 	useEffect(() => {
 		blogService.getAll().then(blogs => {
@@ -29,7 +35,6 @@ const App = () => {
 
 	const handleLogin = async (event) => {
 		event.preventDefault()
-		setErrorMessage("")
 
 		try {
 			const loggedInUser = await loginService.login({
@@ -41,15 +46,16 @@ const App = () => {
 			setUser(loggedInUser)
 			setUsername("")
 			setPassword("")
-			setErrorMessage("")
+			setNotificationMessage("")
 			blogService.setToken(loggedInUser.token)
 			localStorage.setItem(
 				userLocalStorageKey, JSON.stringify(loggedInUser)
 			)
 		} catch {
-			setErrorMessage("Wrong credentials")
+			setNotificationType("error")
+			setNotificationMessage("Wrong credentials")
 			setTimeout(() => {
-				setErrorMessage("")
+				setNotificationMessage("")
 			}, 5000)
 		}
 	}
@@ -57,8 +63,34 @@ const App = () => {
 	const logout = () => {
 		localStorage.setItem(userLocalStorageKey, "")
 		setUser(null)
-		setErrorMessage("")
+		setNotificationMessage("")
 	}
+
+	const addBlog = async (event) => {
+		event.preventDefault()
+
+		try {
+			const newBlog = { title, author, url }
+			const createdBlog = await blogService.create(newBlog)
+
+			setBlogs(blogs.concat(createdBlog))
+
+			setTitle("")
+			setAuthor("")
+			setUrl("")
+
+			setNotificationType("success")
+			setNotificationMessage(`A new blog ${title} by ${author} added`)
+
+			setTimeout(() => {
+				setNotificationMessage("")
+			}, 5000)
+		} catch (err) {
+			setNotificationType("error")
+			setNotificationMessage("Creating blog failed")
+		}
+	}
+
 
 	const loginForm = () => (
 		<form onSubmit={handleLogin}>
@@ -86,6 +118,17 @@ const App = () => {
 		</form>
 	)
 
+	const blogForm = () => (
+		<div>
+			<h2>Create new</h2>
+			<form onSubmit={addBlog}>
+				<div><label>Title:<input required value={title} onChange={({ target }) => setTitle(target.value)} /></label></div>
+				<div><label>Author:<input required value={author} onChange={({ target }) => setAuthor(target.value)} /></label></div>
+				<div><label>URL:<input required value={url} onChange={({ target }) => setUrl(target.value)} /></label></div>				<button type="submit">Save</button>
+			</form>
+		</div>
+	)
+
 	return (
 		<div>
 			{!user && loginForm()}
@@ -97,15 +140,12 @@ const App = () => {
 				</div>
 			)}
 
-			{errorMessage && (
-				<div style={{ color: "red" }}>
-					{errorMessage}
-				</div>
-			)}
+			{notificationMessage && (<Notification message={notificationMessage} type={notificationType} />)}
 
 			{user && (
 				<>
-					<h2>blogs</h2>
+					{blogForm()}
+					<h2>Blogs</h2>
 					{blogs.map(blog => (
 						<Blog key={blog.id} blog={blog} />
 					))}
