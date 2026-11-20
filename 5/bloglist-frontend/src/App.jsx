@@ -1,10 +1,13 @@
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Blog from "./components/Blog"
 import blogService from "./services/blogService"
 import loginService from "./services/loginService"
 import "./App.css"
 import Notification from "./components/Notification"
+import LoginForm from "./components/LoginForm"
+import Togglable from "./components/Togglable"
+import BlogForm from "./components/BlogForm"
 
 const App = () => {
 	const [blogs, setBlogs] = useState([])
@@ -12,11 +15,12 @@ const App = () => {
 	const [username, setUsername] = useState("")
 	const [password, setPassword] = useState("")
 	const userLocalStorageKey = "loggedUser"
-	const [title, setTitle] = useState("")
-	const [author, setAuthor] = useState("")
-	const [url, setUrl] = useState("")
+	const blogFormRef = useRef()
 	const [notificationType, setNotificationType] = useState("error")
 	const [notificationMessage, setNotificationMessage] = useState("")
+	const [loginVisible, setLoginVisible] = useState(false)
+	const hideStyleLogin = { display: loginVisible ? "none" : "" }
+	const visibleStyleLogin = { display: loginVisible ? "" : "none" }
 
 	useEffect(() => {
 		blogService.getAll().then(blogs => {
@@ -32,6 +36,30 @@ const App = () => {
 			blogService.setToken(user.token)
 		}
 	}, [])
+
+	const createBlog = async (blog) => {
+		try {
+			blogFormRef.current.toggleVisibility()
+			const createdBlog = await blogService.create(blog)
+
+			setBlogs(blogs.concat(createdBlog))
+
+			setNotificationType("success")
+			setNotificationMessage(
+				`A new blog ${blog.title} by ${blog.author} added`
+			)
+
+			setTimeout(() => {
+				setNotificationMessage("")
+			}, 5000)
+		} catch (err) {
+			setNotificationType("error")
+			setNotificationMessage("Creating blog failed")
+			setTimeout(() => {
+				setNotificationMessage("")
+			}, 5000)
+		}
+	}
 
 	const handleLogin = async (event) => {
 		event.preventDefault()
@@ -66,72 +94,24 @@ const App = () => {
 		setNotificationMessage("")
 	}
 
-	const addBlog = async (event) => {
-		event.preventDefault()
-
-		try {
-			const newBlog = { title, author, url }
-			const createdBlog = await blogService.create(newBlog)
-
-			setBlogs(blogs.concat(createdBlog))
-
-			setTitle("")
-			setAuthor("")
-			setUrl("")
-
-			setNotificationType("success")
-			setNotificationMessage(`A new blog ${title} by ${author} added`)
-
-			setTimeout(() => {
-				setNotificationMessage("")
-			}, 5000)
-		} catch (err) {
-			setNotificationType("error")
-			setNotificationMessage("Creating blog failed")
-		}
-	}
-
-
-	const loginForm = () => (
-		<form onSubmit={handleLogin}>
-			<div>
-				<label>
-					Username
-					<input
-						type="text"
-						value={username}
-						onChange={({ target }) => setUsername(target.value)}
-					/>
-				</label>
-			</div>
-			<div>
-				<label>
-					Password
-					<input
-						type="password"
-						value={password}
-						onChange={({ target }) => setPassword(target.value)}
-					/>
-				</label>
-			</div>
-			<button type="submit">Login</button>
-		</form>
-	)
-
-	const blogForm = () => (
-		<div>
-			<h2>Create new</h2>
-			<form onSubmit={addBlog}>
-				<div><label>Title:<input required value={title} onChange={({ target }) => setTitle(target.value)} /></label></div>
-				<div><label>Author:<input required value={author} onChange={({ target }) => setAuthor(target.value)} /></label></div>
-				<div><label>URL:<input required value={url} onChange={({ target }) => setUrl(target.value)} /></label></div>				<button type="submit">Save</button>
-			</form>
-		</div>
-	)
 
 	return (
 		<div>
-			{!user && loginForm()}
+			<div>
+				<div style={hideStyleLogin}>
+					<button onClick={() => setLoginVisible(true)}>Log in</button>
+				</div>
+				<div style={visibleStyleLogin}>
+					<LoginForm
+						username={username}
+						password={password}
+						handleUsernameChange={({ target }) => setUsername(target.value)}
+						handlePasswordChange={({ target }) => setPassword(target.value)}
+						handleSubmit={handleLogin}
+					/>
+					<button onClick={() => setLoginVisible(false)}>Cancel</button>
+				</div>
+			</div>
 
 			{user && (
 				<div>
@@ -140,11 +120,18 @@ const App = () => {
 				</div>
 			)}
 
-			{notificationMessage && (<Notification message={notificationMessage} type={notificationType} />)}
+			{notificationMessage && (
+				<Notification
+					message={notificationMessage}
+					type={notificationType}
+				/>
+			)}
 
 			{user && (
 				<>
-					{blogForm()}
+					<Togglable buttonLabel="New blog" ref={blogFormRef}>
+						<BlogForm createBlog={createBlog} />
+					</Togglable>
 					<h2>Blogs</h2>
 					{blogs.map(blog => (
 						<Blog key={blog.id} blog={blog} />
