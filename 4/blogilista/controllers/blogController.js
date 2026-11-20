@@ -29,10 +29,33 @@ blogRouter.post("/", authenticateUser, async (request, response, next) => {
 	}
 })
 
-blogRouter.delete("/:id", async (request, response, next) => {
+blogRouter.delete("/:id", authenticateUser, async (request, response, next) => {
 	try {
 		await Blog.findByIdAndDelete(request.params.id)
 		return response.status(204).end()
+	} catch (err) {
+		next(err)
+	}
+})
+
+blogRouter.put("/:id", async (request, response, next) => {
+	try {
+		const blog = request.body
+		if (typeof blog.user === "object") {
+			blog.user = blog.user.id
+		}
+
+		const updatedBlog = await Blog.findOneAndReplace(
+			{ _id: request.params.id },
+			blog,
+			{ new: true, runValidators: true }
+		)
+
+		if (!updatedBlog) {
+			return response.status(404).end()
+		}
+
+		response.json(updatedBlog)
 	} catch (err) {
 		next(err)
 	}
