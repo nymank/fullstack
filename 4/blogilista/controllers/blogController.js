@@ -29,7 +29,7 @@ blogRouter.post("/", authenticateUser, async (request, response, next) => {
 	}
 })
 
-blogRouter.delete("/:id", authenticateUser, async (request, response, next) => {
+blogRouter.delete("/:id", async (request, response, next) => {
 	try {
 		await Blog.findByIdAndDelete(request.params.id)
 		return response.status(204).end()

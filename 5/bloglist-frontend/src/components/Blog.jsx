@@ -1,7 +1,7 @@
 
 import { useState } from "react"
 
-const Blog = ({ blog, updateBlog }) => {
+const Blog = ({ blog, updateBlog, deleteBlog }) => {
   const [minimized, setMinimized] = useState(true)
 
   const blogStyle = {
@@ -15,6 +15,12 @@ const Blog = ({ blog, updateBlog }) => {
   const onClickLikeButton = () => {
     updateBlog({ ...blog, likes: blog.likes + 1 })
   }
+
+  const onClickRemove = () => {
+    deleteBlog(blog)
+  }
+
+  const isUserDefined = blog.user && blog.user.name
 
   return (
     <div style={blogStyle}>
@@ -30,7 +36,8 @@ const Blog = ({ blog, updateBlog }) => {
           <div>{blog.author}</div>
           <div>{blog.url}</div>
           <div>Likes: {blog.likes} <button onClick={onClickLikeButton}>like</button></div>
-          {blog.user && blog.user.name && <div>{blog.user.name}</div>}
+          {isUserDefined && <div>{blog.user.name}</div>}
+          {isUserDefined && <div><button onClick={onClickRemove}>remove</button></div>}
         </div>
       )}
     </div>

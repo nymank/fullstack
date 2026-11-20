@@ -72,6 +72,22 @@ const App = () => {
 		}
 	}
 
+	const deleteBlog = async (blog) => {
+		try {
+			setNotificationMessage("")
+			const confirmation = window.confirm(`Are you sure you want to delete '${blog.title}' by ${blog.author}`)
+			if (confirmation) {
+				await blogService.deleteOne(blog.id)
+				setBlogs(blogs.filter(b => b.id !== blog.id))
+				setNotificationType("success")
+				setNotificationMessage("Blog deleted")
+			}
+		} catch (err) {
+			setNotificationType("error")
+			setNotificationMessage("Deleting blog failed")
+		}
+	}
+
 	const handleLogin = async (event) => {
 		event.preventDefault()
 
@@ -145,7 +161,7 @@ const App = () => {
 					</Togglable>
 					<h2>Blogs</h2>
 					{blogs.sort((a, b) => b.likes > a.likes).map(blog => (
-						<Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+						<Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
 					))}
 				</>
 			)}
