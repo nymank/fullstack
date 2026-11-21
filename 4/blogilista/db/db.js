@@ -3,14 +3,14 @@ const config = require("../utils/config")
 const logger = require("../utils/logger")
 
 const connectToMongo = () => {
-	const url = config.MONGODB_URI
-	mongoose.connect(url)
-		.then(() => {
-			logger.info("Connected to MongoDB")
-		}).catch(err => {
-			console.error(err)
-			process.exit(1)
-		})
+    const url = config.MONGODB_URI
+    mongoose.connect(url)
+        .then(() => {
+            logger.info("Connected to MongoDB")
+        }).catch(err => {
+            console.error(err)
+            process.exit(1)
+        })
 }
 
 module.exports = { connectToMongo }

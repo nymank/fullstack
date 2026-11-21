@@ -132,7 +132,7 @@ test("a blog can be deleted", async () => {
     await api
         .delete(`/api/blogs/${blogs[0].id}`)
         .expect(204)
-    
+
     const getBlogsRes2 = await api.get("/api/blogs")
     const blogs2 = getBlogsRes2.body
     assert.strictEqual(blogs2.length, initialBlogs.length - 1)
