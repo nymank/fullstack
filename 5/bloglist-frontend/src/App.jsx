@@ -129,22 +129,23 @@ const App = () => {
 
     return (
         <div>
-            <div>
-                <div style={hideStyleLogin}>
-                    <button onClick={() => setLoginVisible(true)}>Log in</button>
+            {!user &&
+                <div>
+                    <div style={hideStyleLogin}>
+                        <button onClick={() => setLoginVisible(true)}>Log in</button>
+                    </div>
+                    <div style={visibleStyleLogin}>
+                        <LoginForm
+                            username={username}
+                            password={password}
+                            handleUsernameChange={({ target }) => setUsername(target.value)}
+                            handlePasswordChange={({ target }) => setPassword(target.value)}
+                            handleSubmit={handleLogin}
+                        />
+                        <button onClick={() => setLoginVisible(false)}>Cancel</button>
+                    </div>
                 </div>
-                <div style={visibleStyleLogin}>
-                    <LoginForm
-                        username={username}
-                        password={password}
-                        handleUsernameChange={({ target }) => setUsername(target.value)}
-                        handlePasswordChange={({ target }) => setPassword(target.value)}
-                        handleSubmit={handleLogin}
-                    />
-                    <button onClick={() => setLoginVisible(false)}>Cancel</button>
-                </div>
-            </div>
-
+            }
             {user && (
                 <div>
                     <p>{user.name} logged in</p>
