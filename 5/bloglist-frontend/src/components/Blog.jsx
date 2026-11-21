@@ -23,7 +23,7 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
     return (
         <div style={blogStyle}>
             <div>
-                {blog.title}
+                {`${blog.title} ${blog.author}`}
                 <button onClick={() => setMinimized(!minimized)}>
                     {minimized ? "view" : "hide"}
                 </button>
