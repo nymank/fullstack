@@ -1,6 +1,7 @@
 const { JWT_SECRET } = require("./config")
 const logger = require("./logger")
 const jwt = require("jsonwebtoken")
+
 const requestLogger = (request, response, next) => {
     const start = Date.now()
 
