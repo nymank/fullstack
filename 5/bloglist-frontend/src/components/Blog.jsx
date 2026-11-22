@@ -36,11 +36,11 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
                     <div>{blog.author}</div>
                     <div>{blog.url}</div>
                     <div>Likes: {blog.likes} <button onClick={onClickLikeButton}>like</button></div>
+                    {blog.user && <div>{blog.user.name}</div>}
                     {blog.user && blog.user.username === currentUser.username &&
-                        <>
-                            <div>{blog.user.name}</div>
-                            <div><button onClick={onClickRemove}>remove</button></div>
-                        </>
+                        <div>
+                            <button name="remove" onClick={onClickRemove}>remove</button>
+                        </div>
                     }
                 </div>
             )}

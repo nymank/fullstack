@@ -22,7 +22,10 @@ blogRouter.post("/", authenticateUser, async (request, response, next) => {
         user.blogs.push(savedBlog.id)
         await user.save()
 
-        return response.status(201).json(savedBlog)
+        return response.status(201).json({
+            ...savedBlog.toJSON(),
+            user: user.toJSON(),
+        })
     } catch (err) {
         next(err)
     }

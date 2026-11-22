@@ -1,8 +1,9 @@
 const { test, expect } = require("@playwright/test")
+const { loginWith, getCurrentTimeDateStr, createBlog, removeBlog } = require("./helper")
 
 test.describe("Blog app", () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto("http://localhost:5173")
+        await page.goto("/")
     })
 
     test("Login form is shown", async ({ page }) => {
@@ -13,64 +14,56 @@ test.describe("Blog app", () => {
     })
 
     test("Login succeeds with correct credentials", async ({ page }) => {
-        await page.getByText("Log in").click()
+        await loginWith(page, "playwright", "playwright")
 
-        await page.getByRole("textbox", { name: "username" }).fill("Calemakar8")
-        await page.getByRole("textbox", { name: "password" }).fill("Calemakar8")
-
-        await page.getByRole("button", { name: "login", exact: true }).click()
-
-        await expect(page.getByText("Cale Makar logged in")).toBeVisible()
+        await expect(page.getByText("Playwright logged in")).toBeVisible()
     })
 
     test("Login fails with incorrect credentials", async ({ page }) => {
-        await page.getByText("Log in").click()
-
-        await page.getByLabel("username").fill("Calemakar8")
-        await page.getByLabel("password").fill("Calemakar7")
-
-        await page.getByRole("button", { name: "login", exact: true }).click()
+        await loginWith(page, "playwright", "WRONGPASSWORD")
 
         await expect(page.getByText("Wrong credentials")).toBeVisible()
-        await expect(page.getByText("Cale Makar logged in")).not.toBeVisible()
+        await expect(page.getByText("Playwright logged in")).not.toBeVisible()
     })
 
-    test("A new blog can be created", async ({ page }) => {
-        await page.getByText("Log in").click()
+    test("A new blog can be created and removed", async ({ page }) => {
+        await loginWith(page, "playwright", "playwright")
 
-        await page.getByLabel("username").fill("mluukkai")
-        await page.getByLabel("password").fill("salainen")
-
-        await page.getByRole("button", { name: "login", exact: true }).click()
-
-        await expect(page.getByText("Matti Luukkainen logged in")).toBeVisible()
-
-        await page.getByText("New blog").click()
+        await expect(page.getByText("Playwright logged in")).toBeVisible()
 
         // test fails if a blog exists with the same name, so let's do this
-        const title = `Matti's blog ${Date.now()}`
-        const author = "Matti Luukkainen"
-        await page.getByRole("textbox", { name: "title" }).fill(title)
-        await page.getByRole("textbox", { name: "author" }).fill(author)
-        await page.getByRole("textbox", { name: "url" }).fill("https://MattiLuukkainen.com")
-        await page.getByRole("button", { name: "Save", exact: true }).click()
+        const title = `Playwright blog @ ${getCurrentTimeDateStr()}`
+        const author = "Playwright"
+        await createBlog(page, title, author, "https://playwright.com")
+
         await expect(
             page.getByText(`A new blog ${title} by ${author} added`)
         ).toBeVisible()
         await expect(
             page.getByText(`${title} ${author}`)
         ).toBeVisible()
+
+        await removeBlog(page, title, author)
+        await expect(page.getByText(`${title} ${author}`)).not.toBeVisible()
+        await expect(page.getByText("Blog deleted")).toBeVisible()
     })
 
     test("Blog can be liked", async ({ page }) => {
-        await page.getByText("Log in").click()
+        await loginWith(page, "playwright", "playwright")
+        await expect(page.getByText("Playwright logged in")).toBeVisible()
 
-        await page.getByLabel("username").fill("Calemakar8")
-        await page.getByLabel("password").fill("Calemakar8")
-        await page.getByRole("button", { name: "login", exact: true }).click()
-        await expect(page.getByText("Cale Makar logged in")).toBeVisible()
+        const title = `Playwright like button test ${getCurrentTimeDateStr()}`
+        const author = "Playwright"
+        await createBlog(page, title, author, "https://playwright.com")
 
-        await page.getByRole("button", { name: "view", exact: true }).first().click()
-        await page.getByRole("button", { name: "like", exact: true }).click()
+        await page.getByText(`${title} ${author}`).getByRole("button", { name: "view" }).click()
+        await expect(page.getByText("Likes: 0")).toBeVisible()
+
+        await page.getByRole("button", { name: "like" }).click()
+        await expect(page.getByText("Likes: 1")).toBeVisible()
+
+        removeBlog(page, title, author, false)
+        await expect(page.getByText(`${title} ${author}`)).not.toBeVisible()
+        await expect(page.getByText("Blog deleted")).toBeVisible()
     })
 })
