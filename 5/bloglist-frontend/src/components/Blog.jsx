@@ -1,16 +1,9 @@
 
 import { useState } from "react"
+import "../styles/Blog.css"
 
 const Blog = ({ blog, updateBlog, deleteBlog }) => {
     const [minimized, setMinimized] = useState(true)
-
-    const blogStyle = {
-        paddingTop: 10,
-        paddingLeft: 2,
-        border: "solid",
-        borderWidth: 1,
-        marginBottom: 5,
-    }
 
     const onClickLikeButton = () => {
         updateBlog({ ...blog, likes: blog.likes + 1 })
@@ -23,7 +16,7 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
     console.log(localStorage.getItem("loggedUser"))
     const currentUser = JSON.parse(localStorage.getItem("loggedUser"))
     return (
-        <div style={blogStyle}>
+        <div className="blog">
             <div>
                 {`${blog.title} ${blog.author}`}
                 <button onClick={() => setMinimized(!minimized)}>

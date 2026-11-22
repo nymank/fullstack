@@ -67,7 +67,7 @@ test.describe("Blog app", () => {
         await expect(page.getByText("Blog deleted")).toBeVisible()
     })
 
-    test("Only user that created the blog can remove it", async ({ page }) => {
+    test("User that created the blog can exclusively remove it", async ({ page }) => {
         // log in with test user
         await loginWith(page, "playwright", "playwright")
         await expect(page.getByText("Playwright logged in")).toBeVisible()
@@ -92,5 +92,74 @@ test.describe("Blog app", () => {
         await loginWith(page, "playwright", "playwright")
         await expect(page.getByText("Playwright logged in")).toBeVisible()
         await removeBlog(page, title, author)
+    })
+
+    test("Blogs are sorted descending by likes", async ({ page }) => {
+        // create 3 blogs and give them different like counts
+        await loginWith(page, "playwright", "playwright")
+        await expect(page.getByText("Playwright logged in")).toBeVisible()
+
+        const author = "Playwright"
+
+        const title1 = `Playwright like sorting blog 1 ${getCurrentTimeDateStr()}`
+        await createBlog(page, title1, author, "https://playwright.com")
+        await page.getByText(`${title1} ${author}`).getByRole("button", { name: "view" }).click()
+        await page.getByRole("button", { name: "like" }).click()
+        await expect(page.getByText("Likes: 1")).toBeVisible()
+        await page.getByText(`${title1} ${author}`).getByRole("button", { name: "hide" }).click()
+
+        const title2 = `Playwright like sorting blog 2 ${getCurrentTimeDateStr()}`
+        await createBlog(page, title2, author, "https://playwright.com")
+        await page.getByText(`${title2} ${author}`).getByRole("button", { name: "view" }).click()
+        await page.getByRole("button", { name: "like" }).click()
+        await page.getByRole("button", { name: "like" }).click()
+        await expect(page.getByText("Likes: 2")).toBeVisible()
+        await page.getByText(`${title2} ${author}`).getByRole("button", { name: "hide" }).click()
+
+        const title3 = `Playwright like sorting blog 3 ${getCurrentTimeDateStr()}`
+        await createBlog(page, title3, author, "https://playwright.com")
+        await page.getByText(`${title3} ${author}`).getByRole("button", { name: "view" }).click()
+        await page.getByRole("button", { name: "like" }).click()
+        await page.getByRole("button", { name: "like" }).click()
+        await page.getByRole("button", { name: "like" }).click()
+        await expect(page.getByText("Likes: 3")).toBeVisible()
+        await page.getByText(`${title3} ${author}`).getByRole("button", { name: "hide" }).click()
+
+        // log in with other test user
+        await page.getByRole("button", { name: "Logout" }).click()
+        await loginWith(page, "playwright2", "playwright2")
+        await expect(page.getByText("Playwright 2 logged in")).toBeVisible()
+
+        // check that the created blogs are sorted in descending order
+        const blogTitles = await page.locator(".blog").allTextContents()
+
+        const index1 = blogTitles.findIndex(text => text.includes(title1))
+        const index2 = blogTitles.findIndex(text => text.includes(title2))
+        const index3 = blogTitles.findIndex(text => text.includes(title3))
+
+        expect(index3).toBeGreaterThanOrEqual(0)
+        expect(index2).toBeGreaterThanOrEqual(0)
+        expect(index1).toBeGreaterThanOrEqual(0)
+
+        expect(index3).toBeLessThan(index2)
+        expect(index2).toBeLessThan(index1)
+
+        // delete test blogs
+        await page.getByRole("button", { name: "Logout" }).click()
+
+        await loginWith(page, "playwright", "playwright")
+        await expect(page.getByText("Playwright logged in")).toBeVisible()
+
+        await removeBlog(page, title1, author)
+        await expect(page.getByText(`${title1} ${author}`)).not.toBeVisible()
+        await expect(page.getByText("Blog deleted")).toBeVisible()
+
+        await removeBlog(page, title2, author)
+        await expect(page.getByText(`${title1} ${author}`)).not.toBeVisible()
+        await expect(page.getByText("Blog deleted")).toBeVisible()
+
+        await removeBlog(page, title3, author)
+        await expect(page.getByText(`${title3} ${author}`)).not.toBeVisible()
+        await expect(page.getByText("Blog deleted")).toBeVisible()
     })
 })
