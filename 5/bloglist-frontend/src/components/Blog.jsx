@@ -12,9 +12,9 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
     const onClickRemove = () => {
         deleteBlog(blog)
     }
-    console.log(blog.user)
-    console.log(localStorage.getItem("loggedUser"))
+
     const currentUser = JSON.parse(localStorage.getItem("loggedUser"))
+
     return (
         <div className="blog">
             <div>
