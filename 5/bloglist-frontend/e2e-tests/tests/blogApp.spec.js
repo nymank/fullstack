@@ -66,4 +66,31 @@ test.describe("Blog app", () => {
         await expect(page.getByText(`${title} ${author}`)).not.toBeVisible()
         await expect(page.getByText("Blog deleted")).toBeVisible()
     })
+
+    test("Only user that created the blog can remove it", async ({ page }) => {
+        // log in with test user
+        await loginWith(page, "playwright", "playwright")
+        await expect(page.getByText("Playwright logged in")).toBeVisible()
+        const title = `Playwright blog remove access test ${getCurrentTimeDateStr()}`
+        const author = "Playwright"
+        await createBlog(page, title, author, "https://playwright.com")
+        await expect(
+            page.getByText(`A new blog ${title} by ${author} added`)
+        ).toBeVisible()
+        await page.getByText(`${title} ${author}`).getByRole("button", { name: "view" }).click()
+        await expect(page.getByRole("button", { name: "remove" })).toBeVisible()
+        await page.getByRole("button", { name: "Logout" }).click()
+
+        // log in with other test user
+        await loginWith(page, "playwright2", "playwright2")
+        await expect(page.getByText("Playwright 2 logged in")).toBeVisible()
+        await page.getByText(`${title} ${author}`).getByRole("button", { name: "view" }).click()
+        await expect(page.getByRole("button", { name: "remove" })).not.toBeVisible()
+        await page.getByRole("button", { name: "Logout" }).click()
+
+        // and again with first user
+        await loginWith(page, "playwright", "playwright")
+        await expect(page.getByText("Playwright logged in")).toBeVisible()
+        await removeBlog(page, title, author)
+    })
 })

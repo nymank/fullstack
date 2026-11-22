@@ -7,7 +7,7 @@ const loginWith = async (page, username, password)  => {
 }
 
 const getCurrentTimeDateStr = () => {
-    return `${new Date().toTimeString().slice(0, 5)} ${new Date().toDateString().slice(4)}`
+    return `${new Date().toTimeString().slice(0, 8)} ${new Date().toDateString().slice(4)}`
 }
 
 const createBlog = async (page, title, author, url) => {

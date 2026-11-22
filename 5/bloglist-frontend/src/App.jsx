@@ -101,12 +101,12 @@ const App = () => {
                 username,
                 password
             })
-            console.log(loggedInUser)
 
             setUser(loggedInUser)
             setUsername("")
             setPassword("")
             setNotificationMessage("")
+            setLoginVisible(false)
             blogService.setToken(loggedInUser.token)
             localStorage.setItem(
                 userLocalStorageKey, JSON.stringify(loggedInUser)
