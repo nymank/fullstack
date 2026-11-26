@@ -9,8 +9,9 @@ import BlogList from "./components/BlogList"
 import {
     Routes, Route, Link,
 } from "react-router-dom"
-import Login from "./components/Logix"
+import Login from "./components/Login"
 import Blog from "./components/Blog"
+import { Button, Footer, Navigation, Page } from "./styles/StyledComponents"
 
 const App = () => {
     const [blogs, setBlogs] = useState([])
@@ -126,18 +127,18 @@ const App = () => {
     }
 
     return (
-        <div>
-            <div>
+        <Page>
+            <Navigation>
                 <Link style={padding} to="/">Home</Link>
                 {!user ? (
                     <Link style={padding} to="/login">Log in</Link>
                 ) : (
-                    <button onClick={logout}>Logout</button>
+                    <Button onClick={logout}>Logout</Button>
                 )}
                 {user && <Link style={padding} to="/create">New blog</Link>}
-            </div>
+            </Navigation>
 
-            {notificationMessage && <div style={padding}><Notification message={notificationMessage} type={notificationType}/> </div>}
+            {notificationMessage && <div style={padding}><Notification message={notificationMessage} type={notificationType} /> </div>}
 
             <Routes>
                 <Route path="/" element={
@@ -176,7 +177,10 @@ const App = () => {
                     />}
                 />)}
             </Routes>
-        </div>
+            <Footer>
+                <span>Bloglist app for FullStack open</span>
+            </Footer>
+        </Page>
     )
 }
 

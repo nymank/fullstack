@@ -1,3 +1,5 @@
+import { Button, Input, Label } from "../styles/StyledComponents"
+
 const LoginForm = ({
     handleSubmit,
     handleUsernameChange,
@@ -11,8 +13,8 @@ const LoginForm = ({
 
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="username">username</label>
-                    <input
+                    <Label htmlFor="username">username</Label>
+                    <Input
                         id="username"
                         name="username"
                         value={username}
@@ -20,8 +22,8 @@ const LoginForm = ({
                     />
                 </div>
                 <div>
-                    <label htmlFor="password">password</label>
-                    <input
+                    <Label htmlFor="password">password</Label>
+                    <Input
                         id="password"
                         name="password"
                         type="password"
@@ -29,7 +31,7 @@ const LoginForm = ({
                         onChange={handlePasswordChange}
                     />
                 </div>
-                <button type="submit">login</button>
+                <Button type="submit">login</Button>
             </form>
         </div>
     )

@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { Button, Input, Label } from "../styles/StyledComponents"
 
 const BlogForm = ({ createBlog }) => {
     const navigate = useNavigate()
+
     const newBlogDefault = {
         title: "",
         author: "",
@@ -10,10 +12,6 @@ const BlogForm = ({ createBlog }) => {
     }
 
     const [newBlog, setNewBlog] = useState(newBlogDefault)
-
-    // useEffect(() => {
-    //     setNewBlog(newBlogDefault)
-    // }, [])
 
     const handleChange = (event) => {
         const { name, value } = event.target
@@ -30,45 +28,41 @@ const BlogForm = ({ createBlog }) => {
         navigate("/")
     }
 
-
     return (
         <div>
             <h2>Create new</h2>
             <form onSubmit={addBlog}>
                 <div>
-                    <label>
-                        Title:
-                        <input
-                            required
-                            name="title"
-                            value={newBlog.title}
-                            onChange={handleChange}
-                        />
-                    </label>
+                    <Label htmlFor="title">Title:</Label>
+                    <Input
+                        id="title"
+                        required
+                        name="title"
+                        value={newBlog.title}
+                        onChange={handleChange}
+                    />
                 </div>
                 <div>
-                    <label>
-                        Author:
-                        <input
-                            required
-                            name="author"
-                            value={newBlog.author}
-                            onChange={handleChange}
-                        />
-                    </label>
+                    <Label htmlFor="author">Author:</Label>
+                    <Input
+                        id="author"
+                        required
+                        name="author"
+                        value={newBlog.author}
+                        onChange={handleChange}
+                    />
                 </div>
                 <div>
-                    <label>
-                        URL:
-                        <input
-                            required
-                            name="url"
-                            value={newBlog.url}
-                            onChange={handleChange}
-                        />
-                    </label>
+                    <Label htmlFor="url">URL:</Label>
+                    <Input
+                        id="url"
+                        required
+                        name="url"
+                        value={newBlog.url}
+                        onChange={handleChange}
+                    />
                 </div>
-                <button type="submit">Save</button>
+                <Button type="submit">Save</Button>
             </form>
         </div>
     )

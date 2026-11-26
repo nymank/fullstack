@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import LoginForm from "./LoginForm"
+import { Button } from "../styles/StyledComponents"
 
 const Login = ({ username, setUsername, password, setPassword, handleLogin }) => {
 
@@ -20,7 +21,7 @@ const Login = ({ username, setUsername, password, setPassword, handleLogin }) =>
                 handlePasswordChange={({ target }) => setPassword(target.value)}
                 handleSubmit={onSubmitLogin}
             />
-            <button onClick={() => navigate("/")}>Cancel</button>
+            <Button onClick={() => navigate("/")}>Cancel</Button>
         </div>
     )
 }

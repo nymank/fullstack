@@ -8,7 +8,7 @@ const BlogList = ({ blogs }) => {
             <ul>
                 {
                     [...blogs].sort((a, b) => b.likes - a.likes).map(blog => (
-                        <li>
+                        <li key={blog.id}>
                             <Link to={`/blogs/${blog.id}`}>{blog.title} by {blog.author}</Link>
                         </li>
                     ))

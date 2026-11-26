@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { NotificationBox } from "../styles/StyledComponents"
 
 const Notification = ({ message, type = "error", durationMs = 5000 }) => {
     const [visible, setVisible] = useState(true)
@@ -18,9 +19,9 @@ const Notification = ({ message, type = "error", durationMs = 5000 }) => {
     if (!message || !visible) return null
 
     return (
-        <div className={`notification ${type}`}>
+        <NotificationBox $type={type} role="alert">
             {message}
-        </div>
+        </NotificationBox>
     )
 }
 
