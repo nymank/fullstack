@@ -93,7 +93,6 @@ const App = () => {
     }
 
     const handleLogin = async () => {
-
         try {
             const loggedInUser = await loginService.login({
                 username,
@@ -103,7 +102,6 @@ const App = () => {
             setUser(loggedInUser)
             setUsername("")
             setPassword("")
-            setNotificationMessage("")
             blogService.setToken(loggedInUser.token)
             localStorage.setItem(
                 userLocalStorageKey, JSON.stringify(loggedInUser)

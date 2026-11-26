@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom"
 import "../styles/Blog.css"
 
 const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
+    const navigate = useNavigate()
 
     const onClickLikeButton = async () => {
         if (user) {
@@ -8,8 +10,10 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
         }
     }
 
-    const onClickRemove = () => {
-        deleteBlog(blog)
+    const onClickRemove = async (e) => {
+        e.preventDefault()
+        await deleteBlog(blog)
+        navigate("/")
     }
 
     return (
