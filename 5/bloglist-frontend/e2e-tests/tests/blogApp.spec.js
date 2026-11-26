@@ -95,7 +95,7 @@ test.describe("Blog app", () => {
         await removeBlog(page, title, author)
     })
 
-    test.skip("Blogs are sorted descending by likes", async ({ page }) => {
+    test("Blogs are sorted descending by likes", async ({ page }) => {
         // Create 3 blogs and give them different like counts
         await loginWith(page, "playwright", "playwright")
 
