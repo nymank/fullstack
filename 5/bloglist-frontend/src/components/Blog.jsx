@@ -21,7 +21,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
         <div className="blog">
             <div>
                 <h2>{blog.author}: {blog.title}</h2>
-                <div>{blog.url}</div>
+                <a href={blog.url} target="blank">{blog.url}</a>
                 <div>Likes: {blog.likes}
                     {user && <Button onClick={onClickLikeButton}>like</Button>}
                 </div>

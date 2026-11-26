@@ -33,7 +33,16 @@ blogRouter.post("/", authenticateUser, async (request, response, next) => {
 
 blogRouter.delete("/:id", async (request, response, next) => {
     try {
-        await Blog.findByIdAndDelete(request.params.id)
+        const blog = await Blog.findByIdAndDelete(request.params.id)
+
+        if (!blog) {
+            return response.status(404).end()
+        }
+
+        await User.findByIdAndUpdate(blog.user, {
+            $pull: { blogs: blog._id }
+        })
+
         return response.status(204).end()
     } catch (err) {
         next(err)
