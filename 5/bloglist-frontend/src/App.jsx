@@ -129,7 +129,11 @@ const App = () => {
         <div>
             <div>
                 <Link style={padding} to="/">Home</Link>
-                {!user ? <Link style={padding} to="/login">Log in</Link> : <button onClick={logout}>Logout</button>}
+                {!user ? (
+                    <Link style={padding} to="/login">Log in</Link>
+                ) : (
+                    <button onClick={logout}>Logout</button>
+                )}
                 {user && <Link style={padding} to="/create">New blog</Link>}
             </div>
 
@@ -143,6 +147,7 @@ const App = () => {
                         deleteBlog={deleteBlog}
                     />
                 } />
+
                 <Route path="/login" element={
                     !user ?
                         <Login
@@ -155,6 +160,7 @@ const App = () => {
                         :
                         <span>Already logged in</span>
                 } />
+
                 {user &&
                     <Route path="/create" element={
                         <BlogForm createBlog={createBlog} />
