@@ -40,7 +40,7 @@ blogRouter.delete("/:id", async (request, response, next) => {
     }
 })
 
-blogRouter.put("/:id", async (request, response, next) => {
+blogRouter.put("/:id", authenticateUser, async (request, response, next) => {
     try {
         const blog = request.body
         if (typeof blog.user === "object") {

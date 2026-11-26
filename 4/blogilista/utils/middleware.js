@@ -55,7 +55,11 @@ const getTokenFrom = request => {
 
 const authenticateUser = async (request, response, next) => {
     try {
-        const decodedToken = jwt.verify(getTokenFrom(request), JWT_SECRET)
+        const token = getTokenFrom(request)
+        if(!token) {
+            return response.status(401).json({ error: "Invalid token" })
+        }
+        const decodedToken = jwt.verify(token, JWT_SECRET)
         if (!(decodedToken.id)) {
             return response.status(401).json({ error: "Invalid token" })
         }

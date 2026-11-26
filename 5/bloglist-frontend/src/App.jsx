@@ -1,13 +1,16 @@
 
-import { useState, useEffect, useRef } from "react"
-import Blog from "./components/Blog"
+import { useState, useEffect } from "react"
 import blogService from "./services/blogService"
 import loginService from "./services/loginService"
 import "./App.css"
 import Notification from "./components/Notification"
-import LoginForm from "./components/LoginForm"
-import Togglable from "./components/Togglable"
 import BlogForm from "./components/BlogForm"
+import BlogList from "./components/BlogList"
+import {
+    Routes, Route, Link,
+} from "react-router-dom"
+import Login from "./components/Logix"
+import Blog from "./components/Blog"
 
 const App = () => {
     const [blogs, setBlogs] = useState([])
@@ -15,12 +18,8 @@ const App = () => {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const userLocalStorageKey = "loggedUser"
-    const blogFormToggleRef = useRef()
     const [notificationType, setNotificationType] = useState("error")
     const [notificationMessage, setNotificationMessage] = useState("")
-    const [loginVisible, setLoginVisible] = useState(false)
-    const hideStyleLogin = { display: loginVisible ? "none" : "" }
-    const visibleStyleLogin = { display: loginVisible ? "" : "none" }
 
     const fetchBlogs = async () => {
         const blogs = await blogService.getAll()
@@ -42,6 +41,7 @@ const App = () => {
 
     const updateBlog = async (blog) => {
         try {
+            setNotificationMessage("")
             setBlogs(prevBlogs =>
                 prevBlogs.map(b => b.id === blog.id ? blog : b)
             )
@@ -53,7 +53,6 @@ const App = () => {
 
     const createBlog = async (blog) => {
         try {
-            blogFormToggleRef.current.toggleVisibility()
             const createdBlog = await blogService.create(blog)
 
             setBlogs(blogs.concat(createdBlog))
@@ -93,8 +92,7 @@ const App = () => {
         }
     }
 
-    const handleLogin = async (event) => {
-        event.preventDefault()
+    const handleLogin = async () => {
 
         try {
             const loggedInUser = await loginService.login({
@@ -106,7 +104,6 @@ const App = () => {
             setUsername("")
             setPassword("")
             setNotificationMessage("")
-            setLoginVisible(false)
             blogService.setToken(loggedInUser.token)
             localStorage.setItem(
                 userLocalStorageKey, JSON.stringify(loggedInUser)
@@ -126,56 +123,55 @@ const App = () => {
         setNotificationMessage("")
     }
 
+    const padding = {
+        padding: 5
+    }
 
     return (
         <div>
-            {!user &&
-                <div>
-                    <div style={hideStyleLogin}>
-                        <button onClick={() => setLoginVisible(true)}>Log in</button>
-                    </div>
-                    <div style={visibleStyleLogin}>
-                        <LoginForm
+            <div>
+                <Link style={padding} to="/">Home</Link>
+                {!user ? <Link style={padding} to="/login">Log in</Link> : <button onClick={logout}>Logout</button>}
+                {user && <Link style={padding} to="/create">New blog</Link>}
+            </div>
+
+            {notificationMessage && <div style={padding}><Notification message={notificationMessage} type={notificationType}/> </div>}
+
+            <Routes>
+                <Route path="/" element={
+                    <BlogList
+                        blogs={blogs}
+                        updateBlog={updateBlog}
+                        deleteBlog={deleteBlog}
+                    />
+                } />
+                <Route path="/login" element={
+                    !user ?
+                        <Login
                             username={username}
+                            setUsername={setUsername}
                             password={password}
-                            handleUsernameChange={({ target }) => setUsername(target.value)}
-                            handlePasswordChange={({ target }) => setPassword(target.value)}
-                            handleSubmit={handleLogin}
+                            setPassword={setPassword}
+                            handleLogin={handleLogin}
                         />
-                        <button onClick={() => setLoginVisible(false)}>Cancel</button>
-                    </div>
-                </div>
-            }
-            {user && (
-                <div>
-                    <p>{user.name} logged in</p>
-                    <button onClick={logout}>Logout</button>
-                </div>
-            )}
-
-            {notificationMessage && (
-                <Notification
-                    message={notificationMessage}
-                    type={notificationType}
-                />
-            )}
-
-            {user && (
-                <>
-                    <Togglable buttonLabel="New blog" ref={blogFormToggleRef}>
+                        :
+                        <span>Already logged in</span>
+                } />
+                {user &&
+                    <Route path="/create" element={
                         <BlogForm createBlog={createBlog} />
-                    </Togglable>
-                    <h2>Blogs</h2>
-                    {[...blogs].sort((a, b) => b.likes - a.likes).map(blog => (
-                        <Blog
-                            key={blog.id}
-                            blog={blog}
-                            updateBlog={updateBlog}
-                            deleteBlog={deleteBlog}
-                        />
-                    ))}
-                </>
-            )}
+                    } />}
+
+                {blogs.map(blog => <Route path={`/blogs/${blog.id}`} element={
+                    <Blog
+                        key={blog.id}
+                        blog={blog}
+                        updateBlog={updateBlog}
+                        deleteBlog={deleteBlog}
+                        user={user}
+                    />}
+                />)}
+            </Routes>
         </div>
     )
 }

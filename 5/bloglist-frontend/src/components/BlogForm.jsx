@@ -1,12 +1,19 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 const BlogForm = ({ createBlog }) => {
+    const navigate = useNavigate()
     const newBlogDefault = {
         title: "",
         author: "",
         url: ""
     }
+
     const [newBlog, setNewBlog] = useState(newBlogDefault)
+
+    // useEffect(() => {
+    //     setNewBlog(newBlogDefault)
+    // }, [])
 
     const handleChange = (event) => {
         const { name, value } = event.target
@@ -20,8 +27,7 @@ const BlogForm = ({ createBlog }) => {
     const addBlog = async (event) => {
         event.preventDefault()
         await createBlog(newBlog)
-
-        setNewBlog(newBlogDefault)
+        navigate("/")
     }
 
 
