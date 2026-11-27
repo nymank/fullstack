@@ -8,10 +8,12 @@ import BlogForm from "./components/BlogForm"
 import BlogList from "./components/BlogList"
 import {
     Routes, Route, Link,
+    useNavigate,
 } from "react-router-dom"
 import Login from "./components/Login"
 import Blog from "./components/Blog"
-import { Button, Footer, Navigation, Page } from "./styles/StyledComponents"
+import NavigationBar from "./components/NavigationBar"
+import { Footer, Page } from "./styles/StyledComponents"
 
 const App = () => {
     const [blogs, setBlogs] = useState([])
@@ -21,6 +23,7 @@ const App = () => {
     const userLocalStorageKey = "loggedUser"
     const [notificationType, setNotificationType] = useState("error")
     const [notificationMessage, setNotificationMessage] = useState("")
+    const navigate = useNavigate("/")
 
     const fetchBlogs = async () => {
         const blogs = await blogService.getAll()
@@ -120,6 +123,7 @@ const App = () => {
         localStorage.setItem(userLocalStorageKey, "")
         setUser(null)
         setNotificationMessage("")
+        navigate("/")
     }
 
     const padding = {
@@ -128,15 +132,7 @@ const App = () => {
 
     return (
         <Page>
-            <Navigation>
-                <Link style={padding} to="/">Home</Link>
-                {!user ? (
-                    <Link style={padding} to="/login">Log in</Link>
-                ) : (
-                    <Button onClick={logout}>Logout</Button>
-                )}
-                {user && <Link style={padding} to="/create">New blog</Link>}
-            </Navigation>
+            <NavigationBar user={user} logout={logout} />
 
             {notificationMessage && <div style={padding}><Notification message={notificationMessage} type={notificationType} /> </div>}
 
@@ -178,7 +174,7 @@ const App = () => {
                 />)}
             </Routes>
             <Footer>
-                <span>Bloglist app for FullStack open</span>
+                <span>Cyberpunk 2077 inspired bloglist app for FullStack open</span>
             </Footer>
         </Page>
     )

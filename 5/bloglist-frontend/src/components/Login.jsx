@@ -21,7 +21,6 @@ const Login = ({ username, setUsername, password, setPassword, handleLogin }) =>
                 handlePasswordChange={({ target }) => setPassword(target.value)}
                 handleSubmit={onSubmitLogin}
             />
-            <Button onClick={() => navigate("/")}>Cancel</Button>
         </div>
     )
 }

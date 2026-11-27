@@ -43,6 +43,17 @@ export const Navigation = styled.div`
     a:hover {
         color: ${colors.red};
     }
+    
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+`
+
+export const NavigationSubContainer = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: space-between;
 `
 
 export const Footer = styled.div`

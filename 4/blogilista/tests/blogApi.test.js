@@ -5,33 +5,59 @@ const supertest = require("supertest")
 const assert = require("node:assert")
 const app = require("../app")
 const Blog = require("../db/models/blog")
+const User = require("../db/models/user")
+const { TEST_USER } = require("../utils/config")
 
 const api = supertest(app)
 
+
 const initialBlogs = [
     {
-        title: "Test blog 1",
-        author: "John Smith",
-        url: "https://notarealblog.com/johnsmith",
-        likes: 12345,
-    },
-    {
-        title: "Test blog 2",
-        author: "Jane Doe",
-        url: "https://notarealblog.com/janedoe",
-        likes: 123456,
-    },
-    {
-        title: "Test blog 3",
+        title: "John's blog",
         author: "John Doe",
         url: "https://notarealblog.com/johndoe",
-        likes: 1234567,
+        likes: 1234,
+    },
+    {
+        title: "Jane's blog",
+        author: "Jane Doe",
+        url: "https://notarealblog.com/janedoe",
+        likes: 12345,
     },
 ]
 
-beforeEach(async () => {
+let token
+
+const resetDbInitialState = async () => {
+    const users = await User.find({})
+
     await Blog.deleteMany({})
-    await Blog.insertMany(initialBlogs)
+
+    const blogs = initialBlogs.map(blog => ({
+        ...blog,
+        user: users.find(user => user.name === blog.author).id,
+    }))
+
+    await Blog.insertMany(blogs)
+}
+
+const login = async (username, password) => {
+    const loginResponse = await api
+        .post("/api/login")
+        .send({
+            username: username,
+            password: password,
+        })
+        .expect(200)
+
+    token = loginResponse.body.token
+    assert.ok(token)
+}
+
+
+beforeEach(async () => {
+    await resetDbInitialState()
+    await login(TEST_USER.username, TEST_USER.password)
 })
 
 test("blogs are returned as json", async () => {
@@ -73,6 +99,7 @@ test("a new blog can be added", async () => {
 
     const postRes = await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
         .send(postBlog)
         .expect(201)
         .expect("Content-Type", /application\/json/)
@@ -82,6 +109,7 @@ test("a new blog can be added", async () => {
     assert.strictEqual(blogs.length, initialBlogs.length + 1)
 
     const addedBlog = blogs.find(blog => blog.id === postRes.body.id)
+
     assert.ok(addedBlog)
     assert.strictEqual(addedBlog.title, postBlog.title)
     assert.strictEqual(addedBlog.author, postBlog.author)
@@ -98,6 +126,7 @@ test("if 'likes' is undefined when POSTing, it's set to 0", async () => {
 
     const postRes = await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
         .send(postBlog)
         .expect(201)
         .expect("Content-Type", /application\/json/)
@@ -105,8 +134,9 @@ test("if 'likes' is undefined when POSTing, it's set to 0", async () => {
     const getBlogsRes = await api.get("/api/blogs")
     const blogs = getBlogsRes.body
     const addedBlog = blogs.find(blog => blog.id === postRes.body.id)
-    assert.strictEqual(addedBlog.likes, 0)
 
+    assert.ok(addedBlog)
+    assert.strictEqual(addedBlog.likes, 0)
 })
 
 test("POST fails if required fields are not present", async () => {
@@ -117,8 +147,27 @@ test("POST fails if required fields are not present", async () => {
 
     await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
         .send(postBlog)
         .expect(400)
+
+    const response = await api.get("/api/blogs")
+
+    assert.strictEqual(response.body.length, initialBlogs.length)
+})
+
+test("POST fails if authentication token is missing", async () => {
+    const postBlog = {
+        title: "Test blog 4",
+        author: "John Miller",
+        url: "https://notarealblog.com/johnmiller",
+        likes: 1,
+    }
+
+    await api
+        .post("/api/blogs")
+        .send(postBlog)
+        .expect(401)
 
     const response = await api.get("/api/blogs")
 
@@ -135,7 +184,9 @@ test("a blog can be deleted", async () => {
 
     const getBlogsRes2 = await api.get("/api/blogs")
     const blogs2 = getBlogsRes2.body
+
     assert.strictEqual(blogs2.length, initialBlogs.length - 1)
+    assert.ok(blogs2.every(blog => blog.id !== blogs[0].id))
 })
 
 test("delete fails if id is in the wrong format", async () => {
@@ -161,5 +212,6 @@ test("delete returns status 204 on deleting nonexistent resource", async () => {
 })
 
 after(async () => {
+    await resetDbInitialState()
     await mongoose.connection.close()
 })
